@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Twitch Switch",
+  "description": "Intelligently opens a new Twitch.tv stream when a user's currently watched one closes.",
+  "version": "1",
+  "browser_action": {
+  "default_icon": "icon.png"
+},  
+"permissions": [
+    "activeTab",
+    "tabs",
+    "https://api.twitch.tv/*"
+   ],
+"background": {
+  "scripts": ["background.js"]
+}
+}

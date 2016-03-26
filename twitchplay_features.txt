@@ -1,0 +1,34 @@
+When watching Twitch.tv streams, this app will automatically load a new stream if the current one comes to an end
+    Detects when a stream comes to an end and loads a new one
+        Only loaded when a Twitch stream is running 
+            * Event pages
+        Use Twitch API to check if stream has ended
+            * Twitch API
+            * Timer for checking https://developer.chrome.com/extensions/alarms
+        * JSON Parsing
+        * Webpage loading
+        Automatically fullscreens new streams if desired
+            * Settings menu
+            * Webpage element interaction ?
+        
+    Intelligently decides which stream a user would like to watch next
+        Allows a user to specify an ordering of what stream to choose if the current one ends
+            * Settings menu
+            * Local storage
+        Option determining whether game types or preferred streamers are preferred
+        Can scrape browser history to automatically determine what streamers and games the user likes
+            * History access
+            * Settings menu
+            
+        Can suggest new games and streams based on aggregated use history of users (anonymously)
+            * Cloud database / code
+            * Cloud DB security?
+            * Sending DB requests via web protocols
+            
+Todo
+Get Active Tab
+options page https://developer.chrome.com/extensions/optionsV2
+load only when needed with event page https://developer.chrome.com/extensions/event_pages
+chrome addon oninstalled https://developer.chrome.com/extensions/runtime#event-onInstalled
+Timer for checking https://developer.chrome.com/extensions/alarms
+jQuery
