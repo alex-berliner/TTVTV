@@ -11,6 +11,15 @@
     "tabs",
     "https://api.twitch.tv/*"
    ],
+  "content_scripts": [
+  {
+    "matches": [
+      "<all_urls>"
+    ],
+    "js": ["content.js"],
+    "run_at": "document_end"
+  }
+],
 "background": {
   "scripts": ["background.js"]
 }

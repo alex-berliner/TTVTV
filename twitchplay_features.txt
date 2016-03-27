@@ -1,3 +1,7 @@
+TODO:
+    https://developer.chrome.com/extensions/messaging
+        Figure out message passing sendResponse or how to send messages from content to background
+
 When watching Twitch.tv streams, this app will automatically load a new stream if the current one comes to an end
     Detects when a stream comes to an end and loads a new one
         Only loaded when a Twitch stream is running 
@@ -26,6 +30,9 @@ When watching Twitch.tv streams, this app will automatically load a new stream i
             * Sending DB requests via web protocols
             
 Todo
+figure out how to change update tab url from content script
+
+
 Get Active Tab
 options page https://developer.chrome.com/extensions/optionsV2
 load only when needed with event page https://developer.chrome.com/extensions/event_pages
