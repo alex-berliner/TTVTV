@@ -1,39 +1,60 @@
-//message handler
-chrome.runtime.onMessage.addListener(
-	function (request, sender, sendResponse) {
-	// console.log(request.message)
-	var stream_hb_msg = "stream_heartbeat_req"
-		var change_url_req = "change_url_req"
-		if (request.message === stream_hb_msg) {
-			// console.log("background.js: Received message from content.js!")
-			console.log("Sending heartbeat response for tab " + sender.url)
-			stream_heartbeat_response(sender);
-		} else if (request.message === change_url_req) {
-			console.log("Changing tab " + sender.url + " to new stream!")
-		}
-});
+// message handler
+// 404 on req from twitch.tv/directory
+chrome.runtime.onMessage.addListener(handle_message);
 
-// //
-function stream_heartbeat_response(sender) {
-	var stream_heartbeat_res = "stream_heartbeat_res";
-	var xmlhttp = new XMLHttpRequest();
-	//check if current page isn't a stream view
-	xmlhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			var jObj = JSON.parse(this.responseText)
-				//check if user is streaming
-                console.log("sending message " + stream_heartbeat_res)
-				chrome.tabs.sendMessage(
-					sender.id, {
-					"message" : stream_heartbeat_res,
-					"result" : jObj.stream == null
-				});
-		}
-	}
-    sender.url = "https://api.twitch.tv/kraken/streams/nl_kripp";
-    console.log(sender.url);
-	xmlhttp.open('GET', sender.url, true);
-	xmlhttp.send();
+function handle_message(request, sender, sendResponse){
+	var stream_hb_msg = "stream_heartbeat_req";
+	var print_to_bg = "print_to_bg";
+    var change_url_req = "change_url_req";
+    if (request.message === stream_hb_msg) {
+        // console.log("background.js: Received message from content.js!")
+        // console.log("Sending heartbeat response for tab " + sender.url)
+        stream_heartbeat_response(request, sender, sendResponse);
+    } else if (request.message === change_url_req) {
+        console.log("Changing tab " + sender.url + " to new stream!");
+    } else if(request.message === print_to_bg){
+        console.log(sender.tab.id + ": " + request.printconts);
+    }
+    return true;
+    
+}
+
+/** 
+  * Called by twitch pages to ensure stream is still active
+  * 
+  */ 
+function stream_heartbeat_response(request, sender, sendResponse) {
+    var stream_heartbeat_res = "stream_heartbeat_res";
+    var xmlhttp = new XMLHttpRequest();
+    //check if current page isn't a stream view
+    // xmlhttp.onreadystatechange = function () {
+        // if (this.readyState == 4 && this.status == 200) {
+            // var jObj = JSON.parse(this.responseText)
+            // sendResponse(jObj.stream != null);
+            // // chrome.tabs.sendMessage(
+                // // sender.tab.id, {
+                // // "message" : stream_heartbeat_res,
+                // // "result" : 
+            // // });
+        // }
+    // }
+    // xmlhttp.onload  = function(){
+        // if(this.status == 404){
+            // console.log("oh boy here comes a bad");
+            // return;
+        // }else {
+            // console.log("A good");
+        // }
+    // }
+    var api_url = 'https://api.twitch.tv/kraken/streams/' + 
+        request.streamer_username;
+    xmlhttp.open("GET", api_url, true);
+    
+    xmlhttp.onloadend = function() {
+        if(xmlhttp.status == 404) 
+            throw new Error(' replied 404');
+    }
+    xmlhttp.send();
 }
 
 // function check_stream(id, url) {
