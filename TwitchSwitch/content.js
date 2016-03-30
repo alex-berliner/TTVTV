@@ -1,19 +1,12 @@
 // // content.js
-// // var url = 'https://api.twitch.tv/kraken/streams/' + username;
-// // if(username.indexOf("/") > -1)
-// // return;
-var stream_url = document.location.href;
-var streamer_username = stream_url.split(".tv/")[1];
-// var api_url = 'https://api.twitch.tv/kraken/streams/' + username;
-// bglog()
-// /**
- // * messages:
- // * incoming
- // *   stream_heartbeat_res: receive status of hb from background
- // * outgoing
- // *   stream_heartbeat_req: request status of stream from background
- // *   change_url_req(url): request to change tab location to new url
-// */
+/**
+ * messages:
+ * incoming
+ *   stream_heartbeat_res: receive status of hb from background
+ * outgoing
+ *   stream_heartbeat_req: request status of stream from background
+ *   change_url_req(url): request to change tab location to new url
+*/
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if( request.message === "stream_heartbeat_res" ) {
@@ -23,6 +16,8 @@ chrome.runtime.onMessage.addListener(
 );
 
 function stream_hb_check(){
+    var stream_url = document.location.href;
+    var streamer_username = stream_url.split(".tv/")[1];
     chrome.runtime.sendMessage(
         {
             "message" : "stream_heartbeat_req",
@@ -37,6 +32,14 @@ function hb_callback(stream_online){
         // return;
     
     bglog("Stream online: " + stream_online);
+    if(stream_online == false){
+        bglog("Switching stream to the bmkibler");
+        chrome.runtime.sendMessage(
+            {
+                "message" : "change_url_req"
+            },
+            hb_callback);
+    }
 }
 
 //log to background instead of content script

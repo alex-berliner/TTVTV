@@ -12,6 +12,7 @@ function handle_message(request, sender, sendResponse){
         stream_heartbeat_response(request, sender, sendResponse);
     } else if (request.message === change_url_req) {
         console.log("Changing tab " + sender.url + " to new stream!");
+        change_tab_url(sender.tab.id, "https://www.google.com");
     } else if(request.message === print_to_bg){
         console.log(sender.tab.id + ": " + request.printconts);
     }
@@ -27,33 +28,15 @@ function stream_heartbeat_response(request, sender, sendResponse) {
     var stream_heartbeat_res = "stream_heartbeat_res";
     var xmlhttp = new XMLHttpRequest();
     //check if current page isn't a stream view
-    // xmlhttp.onreadystatechange = function () {
-        // if (this.readyState == 4 && this.status == 200) {
-            // var jObj = JSON.parse(this.responseText)
-            // sendResponse(jObj.stream != null);
-            // // chrome.tabs.sendMessage(
-                // // sender.tab.id, {
-                // // "message" : stream_heartbeat_res,
-                // // "result" : 
-            // // });
-        // }
-    // }
-    // xmlhttp.onload  = function(){
-        // if(this.status == 404){
-            // console.log("oh boy here comes a bad");
-            // return;
-        // }else {
-            // console.log("A good");
-        // }
-    // }
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            var jObj = JSON.parse(this.responseText)
+            sendResponse(jObj.stream != null);
+        }
+    }
     var api_url = 'https://api.twitch.tv/kraken/streams/' + 
         request.streamer_username;
     xmlhttp.open("GET", api_url, true);
-    
-    xmlhttp.onloadend = function() {
-        if(xmlhttp.status == 404) 
-            throw new Error(' replied 404');
-    }
     xmlhttp.send();
 }
 
@@ -62,9 +45,9 @@ function stream_heartbeat_response(request, sender, sendResponse) {
 // Send res to id
 // }
 
-// function change_tab_url(id, url){
-
-// }
+function change_tab_url(id, url){
+    chrome.tabs.update(id, {"url" : url});
+}
 
 
 // chrome.browserAction.onClicked.addListener(function(tab) {
