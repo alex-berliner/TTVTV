@@ -51,5 +51,5 @@ function bglog(str){
 }
 
 
-// if(username.indexOf("/") <= -1)
+if(username.indexOf("/") <= -1)
     setInterval(stream_hb_check, 2000);

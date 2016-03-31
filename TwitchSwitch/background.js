@@ -1,7 +1,12 @@
-// message handler
-// 404 on req from twitch.tv/directory
-chrome.runtime.onMessage.addListener(handle_message);
+init();
+function init(){
+    chrome.runtime.onMessage.addListener(handle_message);
+    // chrome.browserAction.onClicked.addListener(browser_button_click(tab));
+}
 
+function browser_button_click(tab){
+    chrome.runtime.openOptionsPage();
+}
 function handle_message(request, sender, sendResponse){
 	var stream_hb_msg = "stream_heartbeat_req";
 	var print_to_bg = "print_to_bg";
@@ -12,7 +17,8 @@ function handle_message(request, sender, sendResponse){
         stream_heartbeat_response(request, sender, sendResponse);
     } else if (request.message === change_url_req) {
         console.log("Changing tab " + sender.url + " to new stream!");
-        change_tab_url(sender.tab.id, "https://www.google.com");
+        // change_tab_url(sender.tab.id, "https://www.google.com");
+        console.log(sender.tab.id + ": Switching tab!")
     } else if(request.message === print_to_bg){
         console.log(sender.tab.id + ": " + request.printconts);
     }

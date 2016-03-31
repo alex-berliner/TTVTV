@@ -1,27 +1,37 @@
 {
-  "manifest_version": 2,
-  "name": "Twitch Switch",
-  "description": "Intelligently opens a new Twitch.tv stream when a user's currently watched one closes.",
-  "version": "1",
-  "browser_action": {
-  "default_icon": "icon.png"
-},  
-"permissions": [
-    "activeTab",
-    "tabs",
-    "https://api.twitch.tv/*"
+   "manifest_version":2,
+   "name":"Twitch Switch",
+   "description":"Intelligently opens a new Twitch.tv stream when a user's currently watched one closes.",
+   "version":"1",
+   "browser_action":{
+      "default_icon":"icon.png"
+   },
+   "options_ui":{
+      "page":"options.html",
+      "chrome_style":true
+   },
+   "permissions":[
+      "https://api.twitch.tv/*",
+      "activeTab",
+      "tabs",
+      "storage"
    ],
-  "content_scripts": [
-  {
-    "matches": [
-      "https://*.twitch.tv/*",
-      "http://*.twitch.tv/*"
-    ],
-    "js": ["content.js"],
-    "run_at": "document_end"
-  }
-],
-"background": {
-  "scripts": ["jquery-2.2.1.min.js", "background.js"]
-}
+   "content_scripts":[
+      {
+         "matches":[
+            "https://*.twitch.tv/*",
+            "http://*.twitch.tv/*"
+         ],
+         "js":[
+            "content.js"
+         ],
+         "run_at":"document_end"
+      }
+   ],
+   "background":{
+      "scripts":[
+         "twitch.min.js",
+         "background.js"
+      ]
+   }
 }
