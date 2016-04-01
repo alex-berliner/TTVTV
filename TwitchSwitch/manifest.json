@@ -23,14 +23,15 @@
             "http://*.twitch.tv/*"
          ],
          "js":[
-            "content.js"
+            "content.js",
+            "jquery-2.2.1.min.js"
          ],
          "run_at":"document_end"
       }
    ],
    "background":{
       "scripts":[
-         "twitch.min.js",
+         "db.js",
          "background.js"
       ]
    }

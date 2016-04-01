@@ -1,7 +1,7 @@
 init();
+
 function init(){
     chrome.runtime.onMessage.addListener(handle_message);
-    // chrome.browserAction.onClicked.addListener(browser_button_click(tab));
 }
 
 function browser_button_click(tab){
@@ -55,11 +55,3 @@ function change_tab_url(id, url){
     chrome.tabs.update(id, {"url" : url});
 }
 
-
-// chrome.browserAction.onClicked.addListener(function(tab) {
-// chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-// var username = tabs[0].url;
-// username = username.split("tv/")[1]
-// redirect(username)
-// });
-// });
