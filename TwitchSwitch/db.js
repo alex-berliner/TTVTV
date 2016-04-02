@@ -30,6 +30,14 @@
 	// });
 // }
 
+function init_db(){
+    
+}
+
+function create_db(){
+    
+}
+
 function get_streams_hashmap(){
     
 }
