@@ -46,8 +46,20 @@ function request_history_permission() {
 	chrome.permissions.contains({
 		permissions : ['history']
 	}, function (result) {
-		if (result) {
-			alert("have permission");
+		if (result) {//^(https:\/\/www\.twitch\.tv\/\w*)&
+			// alert("have permission");
+            chrome.history.search({
+                    "text" : "https://www.twitch.tv*",
+                    "startTime" : 0,
+                    "endTime" : new Date().getTime()
+                }, function(history_arr){
+                for(var i = 0; i < history_arr.length; i++){
+                    var url = history_arr[i].url
+                    var regex = /^(https:\/\/www\.twitch\.tv\/\w*)$/g;
+                    if(url.match(regex))
+                        console.log(url + " ### " + history_arr[i].visitCount);
+                }
+            });
 		} else {
 			alert("no have permission");
 			chrome.permissions.request({
