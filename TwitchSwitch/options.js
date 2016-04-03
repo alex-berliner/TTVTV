@@ -45,29 +45,62 @@ $("#gen-history").click(function () {
 function request_history_permission() {
 	chrome.permissions.contains({
 		permissions : ['history']
-	}, function (result) {
-		if (result) {//^(https:\/\/www\.twitch\.tv\/\w*)&
-			// alert("have permission");
-            chrome.history.search({
-                    "text" : "https://www.twitch.tv*",
-                    "startTime" : 0,
-                    "endTime" : new Date().getTime()
-                }, function(history_arr){
-                for(var i = 0; i < history_arr.length; i++){
-                    var url = history_arr[i].url
-                    var regex = /^(https:\/\/www\.twitch\.tv\/\w*)$/g;
-                    if(url.match(regex))
-                        console.log(url + " ### " + history_arr[i].visitCount);
-                }
-            });
-		} else {
-			alert("no have permission");
-			chrome.permissions.request({
-				permissions : ['history']
-			}, function (granted) {
-				if (granted) {}
-				else {}
-			});
-		}
-	});
+	}, history_callback);
 }
+function history_callback(result) {
+    if (result) {
+        // alert("have permission");
+        chrome.history.search({
+                "text" : "https://www.twitch.tv*",
+                "startTime" : 0,
+                "endTime" : new Date().getTime()
+            }, function(history_arr){
+            var streamer_arr = [];
+            for(var i = 0; i < history_arr.length; i++){
+                var url = history_arr[i].url
+                var regex = /^(https:\/\/www\.twitch\.tv\/\w+)$/g;
+                //generate stramer array from urls
+                if(url.match(regex)){
+                    //TODO add validity check for streamers
+                    streamer_arr.push(new streamer_object(url_username(url), history_arr[i].visitCount));
+                }
+            }
+            streamer_arr.sort(function(a,b){
+                if (a.visited_count < b.visited_count) return 1;
+                if (a.visited_count > b.visited_count) return -1;
+                return 0;
+            });
+            console.log($("#sortable").sortable("serialize"));
+            var streamer_html = $("#sortable");
+            for(var i = 0; i < streamer_arr.length; i++){
+                $("#sortable").append("<li class=\"ui-state-default\"><span class=\"ui-icon ui-icon-arrowthick-2-n-s\"></span>" + 
+                streamer_arr[i].visited_count + " " + 
+                streamer_arr[i].username + "</li>");
+            }
+            /*
+            */
+        });
+    } else {
+        alert("no have permission");
+        chrome.permissions.request({
+            permissions : ['history']
+        }, function (granted) {
+            if (granted) {}
+            else {}
+        });
+    }
+}
+
+var streamer_object = class {
+    constructor(username, visited_count) {
+        this.username = username;
+        this.visited_count = visited_count;
+    }
+};
+
+function url_username(username){
+    return username.split("v/")[1];
+}
+
+$( "#sortable" ).sortable();
+$( "#sortable" ).disableSelection();
