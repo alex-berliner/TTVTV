@@ -1,3 +1,97 @@
+/**
+ * Called when user requests to generate view preferences
+ * based on history.
+ */
+$("#gen-history").click(function () {
+	chrome.permissions.contains({
+		permissions : ['history']
+	}, history_callback);
+});
+
+var streamer_array;
+/**
+ * Called when chrome returns history.
+ * Places all of the user's watched twitch streams into an array,
+ * and uses that array to populate the view preferences list.
+ */
+function history_callback(result) {
+    if (result) {
+        chrome.history.search({
+                "text" : "https://www.twitch.tv*",
+                "startTime" : 0,
+                "endTime" : new Date().getTime()
+            }, function(history_arr){
+            var potential_streamer_arr = [];
+            //grab all twitch stream urls from history and add them to array
+            for(var i = 0; i < history_arr.length; i++){
+                var url = history_arr[i].url
+                var regex = /^(https:\/\/www\.twitch\.tv\/\w+)$/g;
+                //generate streamer array from urls
+                if(url.match(regex)){
+                    console.log("add")
+                    //TODO add validity check for streamers
+                    potential_streamer_arr.push(new streamer_object(url_username(url), history_arr[i].visitCount));
+                }
+            }
+            get_valid_streams(potential_streamer_arr);
+        });
+    } else {
+        chrome.permissions.request({
+            permissions : ['history']
+        }, function (granted) {
+            if (granted) {
+                history_callback(true);
+            }
+            else {
+                $("#gen-history-warning").append("You must allow the app to view your browser history to generate streamer preferences.");
+            }
+        });
+    }
+}
+
+function get_valid_streams(potential_streamer_arr){
+    console.log(potential_streamer_arr.length);
+    chrome.runtime.sendMessage(
+    {
+        "message" : "get_valid_streamers",
+        "potential_streamers" : potential_streamer_arr
+    },
+    function(streamers){
+        streamer_array = streamers;
+        // console.log(streamer_array[0]);
+        
+        //sort streamer array by view count
+        streamer_array.sort(function(a,b){
+            if (a.visited_count < b.visited_count) return 1;
+            if (a.visited_count > b.visited_count) return -1;
+            return 0;
+        });
+        
+        //add streamer list items to page
+        var streamer_html = $("#sortable");
+        for(var i = 0; i < streamer_array.length; i++){
+            // console.log(streamer_array[i].username)
+            streamer_html.append("<li class=\"ui-state-default\"><span class=\"ui-icon ui-icon-arrowthick-2-n-s\"></span>" + 
+            streamer_array[i].visited_count + " " + 
+            streamer_array[i].username + "</li>");
+        }
+    });
+}
+
+var streamer_object = class {
+    constructor(username, visited_count) {
+        this.username = username;
+        this.visited_count = visited_count;
+    }
+};
+
+function url_username(username){
+    return username.split("v/")[1];
+}
+
+$( "#sortable" ).sortable();
+$( "#sortable" ).disableSelection();
+
 // Saves options to chrome.storage.sync.
 // function save_options() {
 // var color = document.getElementById('color').value;
@@ -37,70 +131,3 @@
 // }
 // document.addEventListener('DOMContentLoaded', restore_options);
 // document.getElementById('save').addEventListener('click', save_options);
-
-$("#gen-history").click(function () {
-	request_history_permission();
-});
-
-function request_history_permission() {
-	chrome.permissions.contains({
-		permissions : ['history']
-	}, history_callback);
-}
-function history_callback(result) {
-    if (result) {
-        // alert("have permission");
-        chrome.history.search({
-                "text" : "https://www.twitch.tv*",
-                "startTime" : 0,
-                "endTime" : new Date().getTime()
-            }, function(history_arr){
-            var streamer_arr = [];
-            for(var i = 0; i < history_arr.length; i++){
-                var url = history_arr[i].url
-                var regex = /^(https:\/\/www\.twitch\.tv\/\w+)$/g;
-                //generate stramer array from urls
-                if(url.match(regex)){
-                    //TODO add validity check for streamers
-                    streamer_arr.push(new streamer_object(url_username(url), history_arr[i].visitCount));
-                }
-            }
-            streamer_arr.sort(function(a,b){
-                if (a.visited_count < b.visited_count) return 1;
-                if (a.visited_count > b.visited_count) return -1;
-                return 0;
-            });
-            console.log($("#sortable").sortable("serialize"));
-            var streamer_html = $("#sortable");
-            for(var i = 0; i < streamer_arr.length; i++){
-                $("#sortable").append("<li class=\"ui-state-default\"><span class=\"ui-icon ui-icon-arrowthick-2-n-s\"></span>" + 
-                streamer_arr[i].visited_count + " " + 
-                streamer_arr[i].username + "</li>");
-            }
-            /*
-            */
-        });
-    } else {
-        alert("no have permission");
-        chrome.permissions.request({
-            permissions : ['history']
-        }, function (granted) {
-            if (granted) {}
-            else {}
-        });
-    }
-}
-
-var streamer_object = class {
-    constructor(username, visited_count) {
-        this.username = username;
-        this.visited_count = visited_count;
-    }
-};
-
-function url_username(username){
-    return username.split("v/")[1];
-}
-
-$( "#sortable" ).sortable();
-$( "#sortable" ).disableSelection();

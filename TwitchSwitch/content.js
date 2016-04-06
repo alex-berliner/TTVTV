@@ -38,6 +38,7 @@ function hb_callback(stream_online){
             {
                 "message" : "change_url_req"
             },
+            //TODO why is hb_callback calling itself
             hb_callback);
     }
 }
