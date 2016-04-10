@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link rel="stylesheet" href="libs/jquery-ui.min.css" />
   <title>Twitch Switch Options</title>
   <style>
     body: { padding: 10px; }
@@ -8,19 +9,23 @@
   #sortable li { margin: 0 0 0 0; padding: 0.15em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
   #sortable li span { position: absolute; margin-left: -1.3em; }
   </style>
-  <script src="libs/jquery-2.2.1.min.js"></script>
-  <link rel="stylesheet" href="libs/jquery-ui.min.css" />
-  <!-- <script src="options.js"></script> -->
 </head>
+  
+<body ng-app="twitchSwitch" id="streamerListController" ng-controller="streamerListController">
+    <div id="status"></div>
+    <button 
+        id="gen-history"
+        ng-click="add_streamer('a',1)" 
+    >Generate History</button> Streamer: <input type="text" id="streamer_input_name"><br>
 
-<body>
-
-  <div id="status"></div>
-  <button id="gen-history">Generate History</button>
-  <div id="gen-history-warning"></div>
-  <ul id="sortable">
-</ul>
-  <script src='libs/jquery-ui.min.js'></script>
-  <script src="options.js"></script>
+    <div id="gen-history-warning"></div>
+    <ul>
+        <li ng-repeat="streamer in streamers track by $index">
+            <span>{{streamer.name + " " + streamer.view_count}}</span>
+        </li>
+    </ul>
+    <script src="libs/angular.js"></script>
+    <script src="libs/jquery-2.2.1.min.js"></script>
+    <script src="options.js"></script>
 </body>
 </html>
