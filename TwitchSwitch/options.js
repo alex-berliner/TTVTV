@@ -1,68 +1,54 @@
-var streamer_array;
-// var streamer_html_list;
+////////global variables//////////
+
+var streamer_array = [];
 var twitchSwitchApp;
-var phonecatApp;
+var ang_history_scope;
 /**
  * JSON array containing list of streamers
  * name: Name of twitch stream
- * view_count: number of times watched streams
+ * visited_count: number of times watched streams
  */
 var streamer_list_json_arr;
 
-// Called when user requests to generate 
-// view preferences based on history.
-// $("#gen-history").click(function () {
-    // scope.addStreamer("a",1);
-// });
-init();
-function init(){    
-    twitchSwitchApp = angular.module("twitchSwitch", []);
-    var streamerListController = twitchSwitchApp.controller("streamerListController", function($scope) {
-      $scope.streamers = [];
-      $scope.add_streamer = function(name, view_count){
-          $scope.streamers.push(
-            {"name": name,
-             "view_count": view_count}
-          );
-      };
-      // generate history of streamers watched
-      
-    });
-    var scope = angular.element($("#streamerListController")).scope();
-    scope.$apply(function(){
-        scope.add_streamer("1",1);
-    });
-    // var x = document.getElementById('streamerListController');
-    // console.log(x);
-    // var xx = angular.element(x);
-    // console.log(xx);
-    // var xxx = xx.scope();
-    // console.log(xxx);
-    // console.log(streamerListController.scope());
-    // streamer_array = []; 
-    // // streamer_html_list = $("#sortable");
-    // restore_options();
-    
-    
-    // if(streamer_array.length != 0){
-        // return;
-    // }
-    // chrome.permissions.contains({
-        // permissions : ["history"]
-    // }, history_callback);
-    // });
-    // $( "#sortable" ).sortable({
-      // axis: "y",
-      // change: function( event, ui ) {
-          // console.log(event, ui);
-      // }
-    // });
-    // $( "#sortable" ).disableSelection();
-    // $( ".selector" ).on( "sortchange", function( event, ui ) {
-        // // console.log(event, ui);
-    // } );
+//////////////////////////////////
+
+///////////prog init//////////////
+init_angular();
+document.addEventListener('DOMContentLoaded', init);
+//////////////////////////////////
+
+function init_angular(){
+	twitchSwitchApp = angular.module("twitchSwitch", []);
+	var streamerListController = twitchSwitchApp.controller("streamerListController", function ($scope) {
+        $scope.streamers = [];
+        $scope.add_streamer = function (name, visited_count) {
+            $scope.streamers.push({
+                "name" : name,
+                "visited_count" : visited_count
+            });
+        };
+        // generate history of streamers watched
+        $scope.get_history_permission = function(){
+            // populate history
+            chrome.permissions.contains({
+                permissions : ["history"]
+            }, history_callback);
+        }
+    });    
+}
+function init() {
+	ang_history_scope = getScope("streamerListController");
+    streamer_array = ang_history_scope.streamers;
+    ang_history_scope.add_streamer("a", 1);
+    ang_history_scope.add_streamer("a", 1);
+    ang_history_scope.add_streamer("a", 1);
+    ang_history_scope.$digest();
+    console.log(ang_history_scope.streamers);
 }
 
+function getScope(ctrlName) {
+    return angular.element(document.getElementById(ctrlName)).scope();
+}
 
 /**
  * Called when chrome returns history.
@@ -70,116 +56,108 @@ function init(){
  * and uses that array to populate the view preferences list.
  */
 function history_callback(result) {
-    if (result) {
-        chrome.history.search({
-                "text" : "https://www.twitch.tv*",
-                "startTime" : 0,
-                "endTime" : new Date().getTime()
-            }, function(history_arr){
-            var potential_streamer_arr = [];
-            //grab all twitch stream urls from history and add them to array
-            for(var i = 0; i < history_arr.length; i++){
-                var url = history_arr[i].url
+	if (result) {
+		chrome.history.search({
+			"text" : "https://www.twitch.tv*",
+			"startTime" : 0,
+			"endTime" : new Date().getTime()
+		}, function (history_arr) {
+			var potential_streamer_arr = [];
+			//grab all twitch stream urls from history and add them to array
+			for (var i = 0; i < history_arr.length; i++) {
+				var url = history_arr[i].url;
                 var regex = /^(https:\/\/www\.twitch\.tv\/\w+)$/g;
-                //generate streamer array from urls
-                if(url.match(regex)){
-                    console.log("add")
-                    //TODO add validity check for streamers
-                    potential_streamer_arr.push(new streamer_object(url_username(url), history_arr[i].visitCount));
-                }
-            }
-            get_valid_streams(potential_streamer_arr);
-        });
-    } else {
-        chrome.permissions.request({
-            permissions : ["history"]
-        }, function (granted) {
-            if (granted) {
-                history_callback(true);
-            }
-            else {
-                $("#gen-history-warning").append("You must allow the app to view your browser history to generate streamer preferences.");
-            }
-        });
-    }
+				//generate streamer array from urls
+				if (url.match(regex)) {
+					console.log("add")
+					//TODO add validity check for streamers
+					potential_streamer_arr.push(new streamer_object(url_username(url), history_arr[i].visitCount));
+					potential_streamer_arr.push({
+                        "name" : url_username(url),
+                        "visited_count" : history_arr[i].visitCount
+                    });
+				}
+			}
+			get_valid_streams(potential_streamer_arr);
+		});
+	} else {
+		chrome.permissions.request({
+			permissions : ["history"]
+		}, function (granted) {
+			if (granted) {
+				history_callback(true);
+			} else {
+				$("#gen-history-warning").append("You must allow the app to view your browser history to generate streamer preferences.");
+			}
+		});
+	}
 }
-
 
 /**
  * Updates streamer list HTML
  */
-// function update_stream_list(){
-    // streamer_html_list.empty();
-    // for(var i = 0; i < streamer_array.length; i++){
-        // streamer_html_list.append("<li class=\"ui-state-default\"><span class=\"ui-icon ui-icon-arrowthick-2-n-s\"></span>" + 
-        // streamer_array[i].visited_count + " " + 
-        // streamer_array[i].username + "</li>");
-    // }
-// }
+function update_stream_list(){
+    
+}
 
-function sort_streamer_array(){
-    streamer_array.sort(function(a,b){
-        if (a.visited_count < b.visited_count) return 1;
-        if (a.visited_count > b.visited_count) return -1;
-        return 0;
-    });
+function sort_streamer_array() {
+	streamer_array.sort(function (a, b) {
+		if (a.visited_count < b.visited_count)
+			return 1;
+		if (a.visited_count > b.visited_count)
+			return -1;
+		return 0;
+	});
 }
 
 /**
- * 
+ *
  */
-function get_valid_streams(potential_streamer_arr){
-    console.log(potential_streamer_arr.length);
-    chrome.runtime.sendMessage(
-    {
-        "message" : "get_valid_streamers",
-        "potential_streamers" : potential_streamer_arr
-    },
-    function(streamers){
-        streamer_array = streamers;
-        sort_streamer_array();
-        // update_stream_list();
-        save_options();
-    });
+function get_valid_streams(potential_streamer_arr) {
+	console.log(potential_streamer_arr.length);
+	chrome.runtime.sendMessage({
+		"message" : "get_valid_streamers",
+		"potential_streamers" : potential_streamer_arr
+	},
+		function (streamers) {
+		streamer_array = streamers;
+		sort_streamer_array();
+		update_stream_list();
+		save_options();
+	});
 }
-
-var streamer_object = class {
-    constructor(username, visited_count) {
-        this.username = username;
-        this.visited_count = visited_count;
-    }
-};
-
-function url_username(username){
-    return username.split("v/")[1];
+function url_username(username) {
+	return username.split("v/")[1];
 }
 //Saves options to chrome.storage.sync.
 function save_options() {
-    chrome.storage.sync.set({
-        "streamer_array" : streamer_array
-    }, function () {
-        console.log("saved streamer array");
-        restore_options();
-    });
+	chrome.storage.sync.set({
+		"streamer_array" : streamer_array
+	}, function () {
+		console.log("saved streamer array");
+		restore_options();
+	});
 }
 
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-    // Use default value color = "red" and likesColor = true.
-    chrome.storage.sync.get({
-            "streamer_array" : "null"
-        }, function (items) {
-            if(items.streamer_array == "null"){
-                console.log("null");
-                return;
-            }
-            streamer_array = items.streamer_array;
-            console.log(streamer_array[0]);
-            // update_stream_list();
-    });
+	chrome.storage.sync.get({
+		"streamer_array" : []
+	}, function (items) {
+		if (items.streamer_array.length == 0) {
+			console.log("null load array");
+			return;
+		}
+		streamer_array = items.streamer_array;
+		console.log(streamer_array[0]);
+		// update_stream_list();
+	});
 }
-// document.addEventListener("DOMContentLoaded", restore_options);
-// document.getElementById("save").addEventListener("click", save_options);
 
-
+var streamer_object = class {
+	constructor(username, visited_count) {
+		this.username = username;
+		this.visited_count = visited_count;
+	}
+};

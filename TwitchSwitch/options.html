@@ -15,13 +15,13 @@
     <div id="status"></div>
     <button 
         id="gen-history"
-        ng-click="add_streamer('a',1)" 
+        ng-click="get_history_permission()" 
     >Generate History</button> Streamer: <input type="text" id="streamer_input_name"><br>
 
     <div id="gen-history-warning"></div>
     <ul>
         <li ng-repeat="streamer in streamers track by $index">
-            <span>{{streamer.name + " " + streamer.view_count}}</span>
+            <span>{{streamer.name + " " + streamer.visited_count}}</span>
         </li>
     </ul>
     <script src="libs/angular.js"></script>
