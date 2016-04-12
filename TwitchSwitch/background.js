@@ -54,7 +54,7 @@ function check_valid_streams(request, sender, sendResponse){
           }
         };
         var url_beg = "https://api.twitch.tv/kraken/channels/" +
-            potential_streamers_array[i].username;
+            potential_streamers_array[i].name;
         var streamer_promise = $http(url_beg)
           .get(payload)
           .then(callback.success, callback.error);
@@ -63,7 +63,7 @@ function check_valid_streams(request, sender, sendResponse){
     
     Promise.all(promise_array).then(function(result){
         for(var i = 0; i < actual_streamers_array.length; i++){
-            console.log("sd" + actual_streamers_array[i].username);
+            console.log("sd" + actual_streamers_array[i].name);
         }
         sendResponse(actual_streamers_array);
     },function(){});
