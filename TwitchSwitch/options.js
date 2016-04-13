@@ -2,7 +2,7 @@
 
 var streamer_array = [];
 var twitchSwitchApp;
-var ang_history_scope;
+var ang_history_scope = undefined;
 /**
  * JSON array containing list of streamers
  * name: Name of twitch stream
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', init);
 //////////////////////////////////
 
 function init_angular() {
-    console.log("init_angular()");
+    bglog("init_angular()");
 	twitchSwitchApp = angular.module("twitchSwitch", []);
     var streamerListController = twitchSwitchApp.controller("streamerListController", function ($scope) {
         $scope.streamers = [];
@@ -42,12 +42,48 @@ function init_angular() {
     });    
 }
 
+/**
+ * Gets the currently online streamers and then 
+ * calls the online_arr_result_callback on the result
+ */
+function check_online_streams(online_arr_result_callback){
+	chrome.runtime.sendMessage({
+		"message" : "check_online_streams",
+		"streamer_array" : streamer_array
+	},
+    function(streamers){
+        // bglog(streamers);
+        online_arr_result_callback(streamers);
+    });
+}
+
+/**
+ * Called on program start
+ */
 function init() {
-    console.log("init()");
+    bglog("init()");
 	ang_history_scope = getScope("streamerListController");
     streamer_array = ang_history_scope.streamers;
     restore_options();
-    console.log(ang_history_scope.streamers);
+    bglog(ang_history_scope.streamers);
+    chrome.runtime.onMessage.addListener(handle_comm_message);
+}
+
+/**
+ * Handles all incoming communication messages meant 
+ * for the options handler to perform.
+ */
+function handle_comm_message(request, sender, sendResponse){
+    var get_streamer_list = "get_streamer_list";
+    if(request.message === get_streamer_list){
+        // bglog(streamer_array);
+        // bglog("got streamer list request");
+        if(ang_history_scope === undefined){
+        } else {
+            sendResponse(streamer_array);
+        }
+    }
+    return true;
 }
 
 function getScope(ctrlName) {
@@ -60,7 +96,7 @@ function getScope(ctrlName) {
  * and uses that array to populate the view preferences list.
  */
 function history_callback(result) {
-    console.log("history_callback(");
+    bglog("history_callback(");
 	if (result) {
 		chrome.history.search({
 			"text" : "https://www.twitch.tv*",
@@ -74,7 +110,7 @@ function history_callback(result) {
                 var regex = /^(https:\/\/www\.twitch\.tv\/\w+)$/g;
 				//generate streamer array from urls
 				if (url.match(regex)) {
-					console.log("add")
+					bglog("add")
 					//TODO add validity check for streamers
 					potential_streamer_arr.push({
                         "name" : url_username(url),
@@ -98,7 +134,7 @@ function history_callback(result) {
 }
 
 function sort_streamer_array() {
-    console.log("sort_streamer_array()");
+    bglog("sort_streamer_array()");
 	streamer_array.sort(function (a, b) {
 		if (a.visited_count <= b.visited_count)
 			return 1;
@@ -112,8 +148,8 @@ function sort_streamer_array() {
  *
  */
 function get_valid_streams(potential_streamer_arr) {
-    console.log("get_valid_streams(");
-	// console.log(potential_streamer_arr.length);
+    bglog("get_valid_streams(");
+	// bglog(potential_streamer_arr.length);
 	chrome.runtime.sendMessage({
 		"message" : "get_valid_streamers",
 		"potential_streamers" : potential_streamer_arr
@@ -130,11 +166,11 @@ function url_username(username) {
 
 //Saves options to chrome.storage.sync.
 function save_options() {
-    console.log("save_options()");
+    bglog("save_options()");
 	chrome.storage.sync.set({
 		"streamer_array" : streamer_array
 	}, function () {
-		console.log("saved streamer array");
+		bglog("saved streamer array");
 		restore_options();
 	});
 }
@@ -142,27 +178,31 @@ function save_options() {
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-    console.log("restore_options()");
+    bglog("restore_options()");
 	chrome.storage.sync.get({
 		"streamer_array" : []
 	}, function (items) {
 		if (items.streamer_array.length == 0) {
-			console.log("null load array");
+			bglog("null load array");
 			return;
 		}
+        ////////commented to avoid restore crash when ang not active
         // todo possibly add $scope.set_streamer_arr(arr)
-        console.log("Restoring options" + items.streamer_array.length);
-        ang_history_scope.clear_streamer_array();
-        for(var i = 0; i < items.streamer_array.length; i++){
-            ang_history_scope.add_streamer(items.streamer_array[i].name, items.streamer_array[i].visited_count);
-        }
-        ang_history_scope.$digest();
-		// streamer_array = items.streamer_array;
-        // ang_history_scope.$apply();
+        // bglog("Restoring options" + items.streamer_array.length);
+        // ang_history_scope.clear_streamer_array();
+        // for(var i = 0; i < items.streamer_array.length; i++){
+            // ang_history_scope.add_streamer(items.streamer_array[i].name, items.streamer_array[i].visited_count);
+        // }
         // ang_history_scope.$digest();
-        // ang_history_scope.$apply();
-        // ang_history_scope.$digest();
-		// console.log(streamer_array[0]);
-		// update_stream_list();
+        /////////////////////////////////////////
 	});
+}
+
+
+//log to background instead of options script
+function bglog(str){
+    chrome.runtime.sendMessage({
+        "message" : "print_to_bg", 
+        "printconts" : str
+    });
 }
