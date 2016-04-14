@@ -1,14 +1,7 @@
 ////////global variables//////////
 
-var streamer_array = [];
 var twitchSwitchApp;
 var ang_history_scope = undefined;
-/**
- * JSON array containing list of streamers
- * name: Name of twitch stream
- * visited_count: number of times watched streams
- */
-var streamer_list_json_arr;
 
 //////////////////////////////////
 
@@ -25,22 +18,24 @@ function init_angular() {
 	twitchSwitchApp = angular.module("twitchSwitch", []);
     var streamerListController = twitchSwitchApp.controller("streamerListController", function ($scope) {
         $scope.streamers = [];
-        $scope.add_streamer = function (name, visited_count) {
+
+        $scope.add_streamer_single = function (name, visited_count) {
             $scope.streamers.push({
                 "name" : name,
                 "visited_count" : visited_count
             });
+            save_streamer_prefs();
         }
-        $scope.clear_streamer_array = function(){
-            while ($scope.streamers.length) { $scope.streamers.pop(); }
-        }
-    
+        
         // generate history of streamers watched
-        $scope.get_history_permission = function(){
+        $scope.get_history_permission = function() {
             // populate history
             chrome.permissions.contains({
                 permissions : ["history"]
             }, history_callback);
+        }
+        $scope.set_arr = function(arr){
+            $scope.streamers = arr;
         }
     });    
 }
@@ -51,10 +46,10 @@ function init_angular() {
 function init() {
     bglog("init()");
 	ang_history_scope = angular.element(document.getElementById("streamerListController")).scope();
-    streamer_array = ang_history_scope.streamers;
     load_streamer_prefs();
-    
-    bglog(ang_history_scope.streamers);
+    ang_history_scope.add_streamer_single("gobs", 1);
+    // ang_history_scope.$apply();
+    // bglog(ang_history_scope.streamers);
     chrome.runtime.onMessage.addListener(handle_comm_messages);
 }
 
@@ -65,7 +60,7 @@ function init() {
 function check_online_streams(online_arr_result_callback){
 	chrome.runtime.sendMessage({
 		"message" : "check_online_streams_msg",
-		"streamer_array" : streamer_array
+		"streamer_array" : ang_history_scope.streamers
 	},
     function(streamers){
         // bglog(streamers);
@@ -80,11 +75,11 @@ function check_online_streams(online_arr_result_callback){
 function handle_comm_messages(request, sender, sendResponse){
     var get_streamer_list = "get_streamer_list";
     if(request.message === get_streamer_list){
-        // bglog(streamer_array);
+        // bglog(ang_history_scope.streamers);
         // bglog("got streamer list request");
         if(ang_history_scope === undefined){
         } else {
-            sendResponse(streamer_array);
+            sendResponse(ang_history_scope.streamers);
         }
     }
     return true;
@@ -96,7 +91,7 @@ function handle_comm_messages(request, sender, sendResponse){
  * and uses that array to populate the view preferences list.
  */
 function history_callback(result) {
-    // bglog("history_callback(");
+    bglog("history_callback(");
 	if (result) {
 		chrome.history.search({
 			"text" : "https://www.twitch.tv*",
@@ -124,8 +119,9 @@ function history_callback(result) {
 		}, function (granted) {
 			if (granted) {
 				history_callback(true);
+				$("#gen-history-warning").text("");
 			} else {
-				$("#gen-history-warning").append("You must allow the app to view your browser history to generate streamer preferences.");
+				$("#gen-history-warning").text("You must allow the app to view your browser history to generate streamer preferences.");
 			}
 		});
 	}
@@ -136,8 +132,8 @@ function history_callback(result) {
  */
 function sort_streamer_array(streamer_array) {
 	streamer_array.sort(function (a, b) {
-		if (a.visited_count <= b.visited_count)return 1;
-		if (a.visited_count > b.visited_count)return -1;
+		if (a.visited_count <= b.visited_count) return 1;
+		if (a.visited_count > b.visited_count) return -1;
 		return 0;
 	});
 }
@@ -148,15 +144,14 @@ function sort_streamer_array(streamer_array) {
  */
 function get_valid_streams(potential_streamer_arr) {
     bglog("get_valid_streams(");
-	// bglog(potential_streamer_arr.length);
+	bglog(potential_streamer_arr);
 	chrome.runtime.sendMessage({
 		"message" : "get_valid_streamers_msg",
 		"potential_streamers" : potential_streamer_arr
 	}, function (streamers) {
-        streamer_array = streamers;
-        sort_streamer_array(streamer_array);
+        sort_streamer_array(streamers)
+        ang_history_scope.set_arr(streamers);
         save_streamer_prefs();
-        load_streamer_prefs();
 	});
 }
 
@@ -165,11 +160,11 @@ function get_valid_streams(potential_streamer_arr) {
  * background for saving
  */
 function save_streamer_prefs() {
+    bglog("savestart")
 	chrome.runtime.sendMessage({
 		"message" : "save_streamer_prefs_msg",
-        "streamer_array" : streamer_array
+        "streamer_array" : ang_history_scope.streamers
 	}, function (streamers) {
-        streamer_array = streamers;
         bglog("You so save!");
 	});
 }
@@ -183,13 +178,11 @@ function load_streamer_prefs() {
 	chrome.runtime.sendMessage({
 		"message" : "load_streamer_prefs_msg"
 	}, function (pref_obj) {
-        streamer_array = pref_obj.streamer_array;
-        // bglog(streamer_array);
-        ang_history_scope.clear_streamer_array();
-        for(var i = 0; i < streamer_array.length; i++){
-            ang_history_scope.add_streamer(streamer_array[i].name, streamer_array[i].visited_count);
-        }
-        ang_history_scope.$digest();
+        // streamer_array = pref_obj.streamer_array;
+        ang_history_scope.set_arr(pref_obj.streamer_array);
+        ang_history_scope.$apply();
+        // bglog("setting to");
+        // bglog(pref_obj.streamer_array)
 	});
 }
 

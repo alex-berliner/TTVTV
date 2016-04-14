@@ -16,7 +16,12 @@
     <button 
         id="gen-history"
         ng-click="get_history_permission()" 
-    >Generate History</button> Streamer: <input type="text" id="streamer_input_name"><br>
+    >Generate History</button>
+    Streamer: <input ng-model="streamer_name">
+    <button 
+        id="add_streamer_button"
+        ng-click="add_streamer_single(streamer_name, 0);" 
+    >Add</button>
     <p>
     <div id="gen-history-warning"></div>
     <div ng-repeat="streamer in streamers track by $index">
