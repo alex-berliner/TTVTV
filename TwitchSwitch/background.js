@@ -1,12 +1,8 @@
-/*
-    TODO: 
-        Options data is only loaded when the options menu is open causing stored stream data to be unavailable
-            Move load/store functionality to background? Only thing running all the time
-            Implement data statelessness? db?
-        Fully disregard efficiency
-*/
 init();
-
+/**
+ * Background entry point. Sets up communication handlers and 
+ * action button.
+ */
 function init(){
     chrome.runtime.onMessage.addListener(handle_comm_message);
     init_db();
@@ -16,69 +12,118 @@ function init(){
     });
 }
 
+/**
+ * Called by message handler, performs function requests from
+ * other areas of the application.
+ */
 function handle_comm_message(request, sender, sendResponse){
-	var stream_heartbeat_req = "stream_heartbeat_req";
-	var print_to_bg = "print_to_bg";
-    var change_url_req = "change_url_req";
-    var get_valid_streamers = "get_valid_streamers";
-    var check_online_streams = "check_online_streams";
-    if (request.message === stream_heartbeat_req) {
+	var stream_heartbeat_req_msg = "stream_heartbeat_req_msg";
+	var print_to_bg_msg = "print_to_bg_msg";
+    var change_url_req_msg = "change_url_req_msg";
+    var get_valid_streamers_msg = "get_valid_streamers_msg";
+    var save_streamer_prefs_msg = "save_streamer_prefs_msg";
+    var load_streamer_prefs_msg = "load_streamer_prefs_msg";
+    if (request.message === stream_heartbeat_req_msg) {
         // console.log("background.js: Received message from content.js!")
         // console.log("Sending heartbeat response for tab " + sender.url)
         stream_heartbeat_response(request, sender, sendResponse);
-    } else if (request.message === change_url_req) {
-        change_url_req_func(request, sender, sendResponse);
-        console.log("Changing tab " + sender.url + " to new stream!");
-        // console.log(sender.tab.id + ": Switching tab!")
-    } else if(request.message === print_to_bg){
-        console.log(sender.tab.id + ": " + request.printconts);
-    } else if(request.message === get_valid_streamers){
-        check_valid_streams(request, sender, sendResponse);
-    } else if (request.message === check_online_streams){
-        check_online_streams_func(request, sender, sendResponse);
     }
+    else if (request.message === change_url_req_msg) {
+        change_url_req(request, sender, sendResponse);
+        //console.log("Changing tab " + sender.url + " to new stream!");
+        // console.log(sender.tab.id + ": Switching tab!")
+    }
+    else if(request.message === print_to_bg_msg){
+        if(sender.tab == undefined){
+            console.log("Options menu: "+ request.printconts)
+        } else {
+            console.log(sender.tab.id + ": " + request.printconts);
+        }
+    }
+    else if(request.message === get_valid_streamers_msg){
+        check_valid_streams(request, sender, sendResponse);
+    }
+    else if(request.message === save_streamer_prefs_msg){
+        save_streamer_prefs(request, sender, sendResponse);
+    } 
+    else if(request.message === load_streamer_prefs_msg){
+        load_streamer_prefs(sendResponse);
+    } 
     return true;
     
 }
 
+/**
+ * Saves the user's streamer preferences
+ * and performs a callback with the result
+ */
+function save_streamer_prefs(request, sender, sendResponse) {
+    var streamer_array = request.streamer_array
+	chrome.storage.sync.set({
+		"streamer_array" : streamer_array
+	}, function () {
+		sendResponse();
+	});
+}
 
-function change_url_req_func(request, sender, sendResponse){
-	chrome.runtime.sendMessage({
-		"message" : "get_streamer_list"
-	}, function (res_streamer_array) {
-        // console.log(res_streamer_array);
-        var switch_url;
-        // switch_url = "https://www.twitch.tv/" + 
-            // res_streamer_array[0].name;
-        // console.log("switching to " + switch_url);
-        change_tab_url(sender.tab.id, 
-            switch_url
-        );
+/**
+ * Loads the user's streamer preferences
+ * and performs a callback with the result
+ */
+function load_streamer_prefs(sendResponse) {
+	chrome.storage.sync.get({
+		"streamer_array" : []
+	}, function (pref_obj) {
+        // console.log(pref_obj);
+        sendResponse(pref_obj);
+	});
+}
+
+/**
+ * Called when a tab requests to switch pages (ie its stream goes offline).
+ * Loads streamer pref list, checks which are online, and switches the tab
+ * to the most highly rated one.
+ */
+function change_url_req(request, sender, sendResponse){
+	load_streamer_prefs(function (pref_obj) {
+        check_online_streams(pref_obj,function(fav_streams){
+            if(fav_streams.length == 0){
+                console.log("Can't switch, no stream preferences found!");
+                return;
+            }
+            var switch_url;
+            switch_url =
+            // "https://www.google.com/";
+                "https://www.twitch.tv/" + fav_streams[0].name;
+            console.log("switching to " + switch_url);
+            change_tab_url(sender.tab.id, 
+                switch_url
+            );
+        });
 	});
     
 }
 
 /**
- * Determines the most highly recommended n streams
- * based on a streamer array.
+ * Determines the most highly recommended streams
+ * based on a generic streamer array.
  */
-function check_online_streams_func(request, sender, sendResponse){
-    var potential_streamers_array = request.streamer_array;
+function check_online_streams(pref_obj,sendResponse){
+    potential_streamers_array = pref_obj.streamer_array;
     //add all promises to array
     var recommended_streamers_array = [];
     var promise_array = [];
+    // console.log(potential_streamers_array);
     for(let i = 0; i < potential_streamers_array.length; i++){
         var callback = {
           success : function(data){
               stream_data = JSON.parse(data);
             if(stream_data.stream != null){
                 recommended_streamers_array.push(potential_streamers_array[i]);
-                console.log(potential_streamers_array[i].name + " is online");
+                // console.log(potential_streamers_array[i].name + " is online");
             }
           },
-          error : function(data){
-            
-          }
+          error : function(data){}
         };
         var url_beg = "https://api.twitch.tv/kraken/streams/" +
             potential_streamers_array[i].name;
@@ -89,19 +134,16 @@ function check_online_streams_func(request, sender, sendResponse){
     }
     
     Promise.all(promise_array).then(function(result){
-        // for(var i = 0; i < recommended_streamers_array.length; i++){
-            // console.log("sd" + recommended_streamers_array[i].name);
-        // }
         sendResponse(recommended_streamers_array);
     },function(){});
 }
 
 /**
- * Takes an array of stream urls and performs a callback with the valid streams
+ * Determines which potential stream urls from the list represent real twitch accounts. 
+ * Callback with the actual streamer list.
  */
 function check_valid_streams(request, sender, sendResponse){
     var potential_streamers_array = request.potential_streamers;
-    console.log(potential_streamers_array.length);  
     //add all promises to array
     var actual_streamers_array = [];
     var promise_array = [];
@@ -123,25 +165,19 @@ function check_valid_streams(request, sender, sendResponse){
     }
     
     Promise.all(promise_array).then(function(result){
-        // for(var i = 0; i < actual_streamers_array.length; i++){
-            // console.log("sd" + actual_streamers_array[i].name);
-        // }
         sendResponse(actual_streamers_array);
     },function(){});
 }
 
 /** 
   * Called by twitch pages to ensure stream is still active
-  * 
   */ 
 function stream_heartbeat_response(request, sender, sendResponse) {
-    var stream_heartbeat_res = "stream_heartbeat_res";
     var xmlhttp = new XMLHttpRequest();
     //check if current page isn't a stream view
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var jObj = JSON.parse(this.responseText)
-            // sendResponse(jObj.stream != null);
             sendResponse(jObj.stream != null);
         }
     }
@@ -151,11 +187,16 @@ function stream_heartbeat_response(request, sender, sendResponse) {
     xmlhttp.send();
 }
 
-function change_tab_url(id, url){
-    chrome.tabs.update(id, {"url" : url});
+/** 
+  * Loads passed url to tab with tab_id
+  */ 
+function change_tab_url(tab_id, url){
+    chrome.tabs.update(tab_id, {"url" : url});
 }
 
-
+/** 
+  * Performs http request
+  */ 
 var payload = {"topic" : "js","q" : "Promise"};
 function $http(url){
   var core = {
