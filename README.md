@@ -1,1 +1,1 @@
-This is a chrome addon for redirecting Twitch.tv stream viewers to a new channel when their current stream goes offline.
+This is a chrome addon for redirecting Twitch.tv stream viewers to a new channel when their currently viewed stream goes offline.

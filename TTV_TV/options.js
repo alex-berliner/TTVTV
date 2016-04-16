@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', init);
  */
 function init_angular() {
 	console.log("asfsfd")
-	var twitchSwitchApp = angular.module('twitchSwitchApp', ['ui.sortable']);
+	var twitchSwitchApp = angular.module('ttvTvApp', ['ui.sortable']);
 
 	twitchSwitchApp.controller('streamerListController', function ($scope) {
 		ang_history_scope = $scope;
