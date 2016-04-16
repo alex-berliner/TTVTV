@@ -33,6 +33,8 @@
    "background":{
       "scripts":[
         "libs/jquery-2.2.1.min.js",
+        "libs/jquery-ui.min.js",
+        "libs/sortable.js",
         "db.js",
         "background.js"
       ]

@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="libs/jquery-ui.min.css" />
+  <!-- <link rel="stylesheet" href="libs/sortable-test.css" /> -->
   <title>Twitch Switch Options</title>
-  <style>
-    body: { padding: 10px; }
-      #sortable { list-style-type: none; margin: 0; padding: 0; width: 500px; }
-  #sortable li { margin: 0 0 0 0; padding: 0.15em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
-  #sortable li span { position: absolute; margin-left: -1.3em; }
-  </style>
 </head>
-  
-<body ng-app="twitchSwitch" id="streamerListController" ng-controller="streamerListController">
+<div ng-app="twitchSwitchApp" ng-controller="streamerListController" class="container">
     <div id="status"></div>
     <button 
         id="gen-history"
@@ -24,11 +17,20 @@
     >Add</button>
     <p>
     <div id="gen-history-warning"></div>
-    <div ng-repeat="streamer in streamers track by $index">
-        {{streamer.name + " " + streamer.visited_count}}
-    </div>
-    <script src="libs/angular.js"></script>
+
+  <div class="floatleft">
+    <ul ui-sortable="sortableOptions" ng-model="streamers" class="list">
+      <li ng-repeat="streamer in streamers" class="item">
+        {{streamer.name}}
+      </li>
+    </ul>
+  </div>
+  
+  <div class="clear"></div>
+</div>
     <script src="libs/jquery-2.2.1.min.js"></script>
+    <script src="libs/jquery-ui.min.js"></script>
+    <script src="libs/angular.js"></script>
+    <script src="libs/sortable.js"></script>
     <script src="options.js"></script>
-</body>
 </html>
