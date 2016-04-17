@@ -24,6 +24,17 @@ function init_angular() {
         $scope.prune_dupes = function(){
             
         }
+        $scope.squig = function(str){
+            console.log(str);
+        }
+        $scope.remove_streamer = function(name){
+            for(var i = 0; i < $scope.streamers.length; i++){
+                if($scope.streamers[i].name == name){
+                    $scope.streamers.splice(i,1);
+                }
+            }
+            save_streamer_prefs();
+        }
         
 		$scope.add_streamer_single = function (name, visited_count) {
             for(var i = 0; i < $scope.streamers.length; i++){

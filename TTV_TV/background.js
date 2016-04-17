@@ -8,7 +8,7 @@ function init(){
     init_db();
     //open settings page in new tab on browser button click
     chrome.browserAction.onClicked.addListener(function(tab) {
-        chrome.tabs.create({"url": "chrome-extension://ogemjeoigjjeoldcaoafbghahfhdamim/options.html"});
+        chrome.tabs.create({"url": "chrome-extension://lfpiejkfapjmehcfafmijmijnilkggam/options.html"});
     });
 }
 

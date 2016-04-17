@@ -21,7 +21,7 @@
   <div class="floatleft">
     <ul ui-sortable="sortableOptions" ng-model="streamers" class="list">
       <li ng-repeat="streamer in streamers" class="item">
-        {{streamer.name}}
+        {{streamer.visited_count + streamer.name}}<button ng-click="remove_streamer(streamer.name)">d</button>
       </li>
     </ul>
   </div>
