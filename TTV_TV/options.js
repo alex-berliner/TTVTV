@@ -64,6 +64,7 @@ function init_angular() {
 		$scope.sortingLog = [];
 
 		$scope.sortableOptions = {
+            axis: 'y',
 			activate : function () {
 				console.log("activate");
 			},

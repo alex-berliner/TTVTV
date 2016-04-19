@@ -1,3 +1,16 @@
+.remove_streamer_button{
+    width: 10px;
+    height: 10px;
+    float:right;
+    padding: 2px 0px 0px 0px; 
+}
+.streamer_list_name{
+    display:inline-block;
+}
+.streamer_list_views{
+    display:inline-block;
+    float:left;
+}
 .list {
 	list-style: none outside none;
 	margin: 10px 0 30px;
@@ -9,8 +22,8 @@
 	margin: 2px 0;
 	border: 1px solid #444;
 	border-radius: 5px;
-	background-color: #EA8A8A;
-
+	background-color: #6441A5;
+    color: #F1F1F1;
 	font-size: 1em;
 	font-weight: bold;
 	text-align: center;
