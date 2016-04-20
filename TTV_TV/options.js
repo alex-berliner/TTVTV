@@ -1,12 +1,11 @@
 ////////global variables//////////
 
 var twitchSwitchApp;
-var ang_history_scope = undefined;
+var ang_history_scope;
 
 //////////////////////////////////
 
 ///////////prog init//////////////
-console.log("asfsfd")
 init_angular();
 document.addEventListener('DOMContentLoaded', init);
 //////////////////////////////////
@@ -15,35 +14,35 @@ document.addEventListener('DOMContentLoaded', init);
  * Initializes all angular controls for the web page
  */
 function init_angular() {
-	console.log("asfsfd")
 	var twitchSwitchApp = angular.module('ttvTvApp', ['ui.sortable']);
 
 	twitchSwitchApp.controller('streamerListController', function ($scope) {
 		ang_history_scope = $scope;
+        $scope.active_streamers = [];
+        $scope.inactive_streamers = [];
         
         $scope.prune_dupes = function(){
             
         }
-        $scope.squig = function(str){
-            console.log(str);
-        }
+        
+        //probably missing stuff
         $scope.remove_streamer = function(name){
-            for(var i = 0; i < $scope.streamers.length; i++){
-                if($scope.streamers[i].name == name){
-                    $scope.streamers.splice(i,1);
+            for(var i = 0; i < $scope.inactive_streamers.length; i++){
+                if($scope.inactive_streamers[i].name == name){
+                    $scope.inactive_streamers.splice(i,1);
                 }
             }
             save_streamer_prefs();
         }
         
 		$scope.add_streamer_single = function (name, visited_count) {
-            for(var i = 0; i < $scope.streamers.length; i++){
+            for(var i = 0; i < $scope.inactive_streamers.length; i++){
                 // don't allow duplicate names
-                if($scope.streamers[i].name == name){
+                if($scope.inactive_streamers[i].name == name){
                     return;
                 }
             }
-			$scope.streamers.push({
+			$scope.inactive_streamers.push({
 				"name" : name,
 				"visited_count" : visited_count
 			});
@@ -58,13 +57,13 @@ function init_angular() {
 			}, history_callback);
 		}
 		$scope.set_arr = function (arr) {
-			$scope.streamers = arr;
+			$scope.inactive_streamers = arr;
 		}
 
 		$scope.sortingLog = [];
 
 		$scope.sortableOptions = {
-            axis: 'y',
+            connectWith: ".streamer_list",
 			activate : function () {
 				console.log("activate");
 			},
@@ -138,7 +137,7 @@ function init() {
 function check_online_streams(online_arr_result_callback) {
 	chrome.runtime.sendMessage({
 		"message" : "check_online_streams_msg",
-		"streamer_array" : ang_history_scope.streamers
+		"streamer_array" : ang_history_scope.inactive_streamers
 	},
 		function (streamers) {
 		// bglog(streamers);
@@ -157,7 +156,7 @@ function handle_comm_messages(request, sender, sendResponse) {
 		// bglog("got streamer list request");
 		if (ang_history_scope === undefined) {}
 		else {
-			sendResponse(ang_history_scope.streamers);
+			sendResponse(ang_history_scope.inactive_streamers);
 		}
 	}
 	return true;
@@ -240,10 +239,11 @@ function get_valid_streams(potential_streamer_arr) {
  * background for saving
  */
 function save_streamer_prefs() {
-	bglog("savestart")
+    console.log("Saving streamers")
+	bglog("Saving streamers")
 	chrome.runtime.sendMessage({
 		"message" : "save_streamer_prefs_msg",
-		"streamer_array" : ang_history_scope.streamers
+		"streamer_array" : ang_history_scope.inactive_streamers
 	}, function (streamers) {
 		bglog("You so save!");
 	});
