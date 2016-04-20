@@ -58,9 +58,12 @@ function handle_comm_message(request, sender, sendResponse){
  * and performs a callback with the result
  */
 function save_streamer_prefs(request, sender, sendResponse) {
-    var streamer_array = request.streamer_array
+    var active_streamers = request.active_streamers
+    var inactive_streamers = request.inactive_streamers
+    console.log(inactive_streamers);
 	chrome.storage.sync.set({
-		"streamer_array" : streamer_array
+		"inactive_streamers" : inactive_streamers,
+        "active_streamers"   : active_streamers
 	}, function () {
 		sendResponse();
 	});
@@ -72,9 +75,11 @@ function save_streamer_prefs(request, sender, sendResponse) {
  */
 function load_streamer_prefs(sendResponse) {
 	chrome.storage.sync.get({
-		"streamer_array" : []
+		"inactive_streamers" : [],
+        "active_streamers"   : []
 	}, function (pref_obj) {
-        // console.log(pref_obj);
+        console.log("asdasdasdasda")
+        console.log(pref_obj);
         sendResponse(pref_obj);
 	});
 }
@@ -109,7 +114,7 @@ function change_url_req(request, sender, sendResponse){
  * based on a generic streamer array.
  */
 function check_online_streams(pref_obj,sendResponse){
-    potential_streamers_array = pref_obj.streamer_array;
+    potential_streamers_array = pref_obj.active_streamers;
     //add all promises to array
     var recommended_streamers_array = [];
     var promise_array = [];
@@ -120,7 +125,6 @@ function check_online_streams(pref_obj,sendResponse){
               stream_data = JSON.parse(data);
             if(stream_data.stream != null){
                 recommended_streamers_array.push(potential_streamers_array[i]);
-                // console.log(potential_streamers_array[i].name + " is online");
             }
           },
           error : function(data){}
