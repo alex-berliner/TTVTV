@@ -3,6 +3,11 @@ init();
 function init(){
     setInterval(stream_hb_check, 2000);
 }
+document.addEventListener('DOMContentLoaded', function(){
+    $.get(chrome.extension.getURL('popup.html'), function(data) {
+        $(data).appendTo('body');
+    });
+});
 
 /**
  * Initiates stream switching process when current stream is offline
