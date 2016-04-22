@@ -6,9 +6,11 @@
    "browser_action":{
       "default_icon":"libs/images/icon128.png"
    },
-   "icons": { "16": "libs/images/icon16.png",
+   "icons": {
+        "16": "libs/images/icon16.png",
            "48": "libs/images/icon48.png",
-          "128": "libs/images/icon128.png" },
+          "128": "libs/images/icon128.png" 
+          },
    "options_ui":{
       "page":"options.html",
       "chrome_style":true
@@ -30,14 +32,11 @@
             "libs/jquery-2.2.1.min.js",
             "content.js"
          ],
-         "run_at":"document_end"
+         "run_at":"document_start"
       }
    ],
    "background":{
       "scripts":[
-        "libs/jquery-2.2.1.min.js",
-        "libs/jquery-ui.min.js",
-        "libs/sortable.js",
         "db.js",
         "background.js"
       ]

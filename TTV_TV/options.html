@@ -19,9 +19,9 @@
     <div id="gen-history-warning"></div>
 
   <div class="floatleft">
-      <div class="floatleft">Inactive</div>
+    <div class="floatleft">Inactive</div>
     <ul ui-sortable="sortableOptions" ng-model="inactive_streamers" class="streamer_list floatleft">
-      <li ng-repeat="streamer in inactive_streamers track by $index" class="item">
+      <div ng-repeat="streamer in inactive_streamers track by $index" class="item">
         <div class="streamer_list_views">{{streamer.visited_count}}</div>
         <div class="streamer_list_name">{{streamer.name}}</div>
         <input 
@@ -29,11 +29,11 @@
             ng-click="remove_streamer(streamer.name)" 
             class="remove_streamer_button"
             src="libs/images/remove_streamer_icon.png" />
-      </li>
+      </div>
     </ul>
     <div class="floatleft">Active</div>
     <ul ui-sortable="sortableOptions" ng-model="active_streamers" class="streamer_list floatleft">
-      <li ng-repeat="streamer in active_streamers track by $index" class="item">
+      <div ng-repeat="streamer in active_streamers track by $index" class="item">
         <div class="streamer_list_views">{{streamer.visited_count}}</div>
         <div class="streamer_list_name">{{streamer.name}}</div>
         <input 
@@ -41,7 +41,7 @@
             ng-click="remove_streamer(streamer.name)" 
             class="remove_streamer_button"
             src="libs/images/remove_streamer_icon.png" />
-      </li>
+      </div>
     </ul>
   </div>
   

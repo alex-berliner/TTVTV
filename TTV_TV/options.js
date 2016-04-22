@@ -70,57 +70,47 @@ function init_angular() {
 
 		$scope.sortableOptions = {
             connectWith: ".streamer_list",
-			activate : function () {
-				console.log("activate");
-			},
-			beforeStop : function () {
-				console.log("beforeStop");
-			},
-			change : function () {
-				console.log("change");
-			},
-			create : function () {
-				console.log("create");
-			},
-			deactivate : function () {
-				console.log("deactivate");
-			},
-			out : function () {
-				console.log("out");
-			},
-			over : function () {
-				console.log("over");
-			},
-			receive : function () {
-				console.log("receive");
-			},
-			remove : function () {
-				console.log("remove");
-			},
-			sort : function () {
-				console.log("sort");
-			},
-			start : function () {
-				console.log("start");
-			},
-			update : function (e, ui) {
-				console.log("update");
-
-				// var logEntry = $scope.streamers.map(function(i){
-				// return i.value;
-				// }).join(', ');
-				// $scope.sortingLog.push('Update: ' + logEntry);
-			},
 			stop : function (e, ui) {
 				console.log("stop");
 				save_streamer_prefs();
-
-				// this callback has the changed model
-				// var logEntry = $scope.streamers.map(function(i){
-				// return i.value;
-				// }).join(', ');
-				// $scope.sortingLog.push('Stop: ' + logEntry);
 			}
+            // ,
+			// activate : function () {
+				// console.log("activate");
+			// },
+			// beforeStop : function () {
+				// console.log("beforeStop");
+			// },
+			// change : function () {
+				// console.log("change");
+			// },
+			// create : function () {
+				// console.log("create");
+			// },
+			// deactivate : function () {
+				// console.log("deactivate");
+			// },
+			// out : function () {
+				// console.log("out");
+			// },
+			// over : function () {
+				// console.log("over");
+			// },
+			// receive : function () {
+				// console.log("receive");
+			// },
+			// remove : function () {
+				// console.log("remove");
+			// },
+			// sort : function () {
+				// console.log("sort");
+			// },
+			// start : function () {
+				// console.log("start");
+			// },
+			// update : function (e, ui) {
+				// console.log("update");
+			// }
 		};
         function streamer_exists(arr, name){
             for(var i = 0; i < arr.length; i++){
@@ -137,9 +127,6 @@ function init_angular() {
 function init() {
 	bglog("init()");
 	load_streamer_prefs();
-	// ang_history_scope.$apply();
-	// bglog(ang_history_scope.streamers);
-	// chrome.runtime.onMessage.addListener(handle_comm_messages);
 }
 
 /**
@@ -151,28 +138,10 @@ function check_online_streams(online_arr_result_callback) {
 		"message" : "check_online_streams_msg",
 		"streamer_array" : ang_history_scope.active_streamers
 	},
-		function (streamers) {
-		// bglog(streamers);
+    function (streamers) {
 		online_arr_result_callback(streamers);
 	});
 }
-
-// /**
- // * Handles all incoming communication messages meant
- // * for the options handler to perform.
- // */
-// function handle_comm_messages(request, sender, sendResponse) {
-	// var get_streamer_list = "get_streamer_list";
-	// if (request.message === get_streamer_list) {
-		// // bglog(ang_history_scope.streamers);
-		// // bglog("got streamer list request");
-		// if (ang_history_scope === undefined) {}
-		// else {
-			// sendResponse(ang_history_scope.inactive_streamers);
-		// }
-	// }
-	// return true;
-// }
 
 /**
  * Called when chrome returns history.
@@ -242,6 +211,7 @@ function get_valid_streams(potential_streamer_arr) {
 	}, function (streamers) {
 		sort_streamer_array(streamers)
 		ang_history_scope.set_inactive_arr(streamers);
+		ang_history_scope.set_active_arr([]);
 		save_streamer_prefs();
 	});
 }
@@ -260,6 +230,7 @@ function save_streamer_prefs() {
 		"active_streamers" : ang_history_scope.active_streamers
 	}, function (streamers) {
 		bglog("You so save!");
+        ang_history_scope.$apply();
 	});
 }
 
@@ -277,8 +248,6 @@ function load_streamer_prefs() {
 		ang_history_scope.set_inactive_arr(pref_obj.inactive_streamers);
 		ang_history_scope.set_active_arr(pref_obj.active_streamers);
 		ang_history_scope.$apply();
-		// bglog("setting to");
-		// bglog(pref_obj.streamer_array)
 	});
 }
 

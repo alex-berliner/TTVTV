@@ -78,8 +78,6 @@ function load_streamer_prefs(sendResponse) {
 		"inactive_streamers" : [],
         "active_streamers"   : []
 	}, function (pref_obj) {
-        console.log("asdasdasdasda")
-        console.log(pref_obj);
         sendResponse(pref_obj);
 	});
 }
@@ -96,9 +94,7 @@ function change_url_req(request, sender, sendResponse){
                 console.log("Can't switch, no stream preferences found!");
                 return;
             }
-            var switch_url;
-            switch_url =
-            // "https://www.google.com/";
+            var switch_url =
                 "https://www.twitch.tv/" + fav_streams[0].name;
             console.log("switching to " + switch_url);
             change_tab_url(sender.tab.id, 
@@ -120,20 +116,16 @@ function check_online_streams(pref_obj,sendResponse){
     var promise_array = [];
     // console.log(potential_streamers_array);
     for(let i = 0; i < potential_streamers_array.length; i++){
-        var callback = {
-          success : function(data){
-              stream_data = JSON.parse(data);
-            if(stream_data.stream != null){
-                recommended_streamers_array.push(potential_streamers_array[i]);
-            }
-          },
-          error : function(data){}
-        };
         var url_beg = "https://api.twitch.tv/kraken/streams/" +
             potential_streamers_array[i].name;
         var streamer_promise = $http(url_beg)
-          .get(payload)
-          .then(callback.success, callback.error);
+            .get(payload)
+            .then(function(data){
+                var stream_data = JSON.parse(data);
+                if(stream_data.stream != null){
+                    recommended_streamers_array.push(potential_streamers_array[i]);
+                }
+          }, function(data){});
       promise_array.push(streamer_promise);
     }
     
@@ -152,19 +144,13 @@ function check_valid_streams(request, sender, sendResponse){
     var actual_streamers_array = [];
     var promise_array = [];
     for(let i = 0; i < potential_streamers_array.length; i++){
-        var callback = {
-          success : function(data){
-            actual_streamers_array.push(potential_streamers_array[i]);
-          },
-          error : function(data){
-            
-          }
-        };
         var url_beg = "https://api.twitch.tv/kraken/channels/" +
             potential_streamers_array[i].name;
         var streamer_promise = $http(url_beg)
-          .get(payload)
-          .then(callback.success, callback.error);
+            .get(payload)
+            .then(function(data){
+                actual_streamers_array.push(potential_streamers_array[i]);
+            }, function(data){});
       promise_array.push(streamer_promise);
     }
     
@@ -177,18 +163,14 @@ function check_valid_streams(request, sender, sendResponse){
   * Called by twitch pages to ensure stream is still active
   */ 
 function stream_heartbeat_response(request, sender, sendResponse) {
-    var xmlhttp = new XMLHttpRequest();
-    //check if current page isn't a stream view
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var jObj = JSON.parse(this.responseText)
-            sendResponse(jObj.stream != null);
-        }
-    }
     var api_url = 'https://api.twitch.tv/kraken/streams/' + 
         request.streamer_username;
-    xmlhttp.open("GET", api_url, true);
-    xmlhttp.send();
+    var heartbeat_promise = $http(api_url)
+        .get(payload)
+        .then(function(data){
+            var stream_data = JSON.parse(data);
+            sendResponse(stream_data.stream != null);
+      }, function(data){});
 }
 
 /** 
@@ -221,6 +203,8 @@ function $http(url){
           }
         }
         client.open(method, uri);
+        client.setRequestHeader("Accept", "application/vnd.twitchtv.v2+json");
+        client.setRequestHeader("Client-ID", "afx1wpn7h97g7yjtukh15hwi2n8urx5");
         client.send();
 
         client.onload = function(){

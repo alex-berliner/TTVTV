@@ -4,22 +4,6 @@ function init(){
     setInterval(stream_hb_check, 2000);
 }
 
-// /**
- // * messages:
- // * incoming
- // *   stream_heartbeat_res: receive status of hb from background
- // * outgoing
- // *   stream_heartbeat_req: request status of stream from background
- // *   change_url_req(url): request to change tab location to new url
-// */
-// chrome.runtime.onMessage.addListener(
-  // function(request, sender, sendResponse) {
-    // if( request.message === "stream_heartbeat_res" ) {
-        // bglog("zoop");
-    // }
-  // }
-// );
-
 /**
  * Initiates stream switching process when current stream is offline
  */
