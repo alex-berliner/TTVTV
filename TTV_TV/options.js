@@ -39,16 +39,17 @@ function init_angular() {
             save_streamer_prefs();
         }
         
+        var add_streamer_textbox = $("#add_streamer_textbox");
 		$scope.add_streamer_single = function (name, visited_count) {
-            if(
-            !streamer_exists($scope.active_streamers,name) &&
-            !streamer_exists($scope.inactive_streamers,name))
+            if(!streamer_exists($scope.active_streamers, name) &&
+               !streamer_exists($scope.inactive_streamers, name))
             {
                 $scope.inactive_streamers.push({
                     "name" : name,
                     "visited_count" : visited_count
                 });
                 save_streamer_prefs();
+                $("#add_streamer_textbox").value="";
             }
 		}
 
@@ -66,12 +67,9 @@ function init_angular() {
 			$scope.inactive_streamers = arr;
 		}
 
-		$scope.sortingLog = [];
-
 		$scope.sortableOptions = {
             connectWith: ".streamer_list",
 			stop : function (e, ui) {
-				console.log("stop");
 				save_streamer_prefs();
 			}
             // ,
@@ -220,7 +218,7 @@ function get_valid_streams(potential_streamer_arr) {
  * Passes streamer preference data to
  * background for saving
  */
-function save_streamer_prefs() {
+function save_streamer_prefs(callback=function(){}) {
     console.log("Saving streamers");
     console.log(ang_history_scope.active_streamers);
     bglog("Saving streamers")
@@ -231,6 +229,7 @@ function save_streamer_prefs() {
 	}, function (streamers) {
 		bglog("You so save!");
         ang_history_scope.$apply();
+        callback();
 	});
 }
 

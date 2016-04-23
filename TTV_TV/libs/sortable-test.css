@@ -2,27 +2,38 @@ body {
     background-color: darkgrey;
 }
 
+.streamer_dragger {
+    float: left;
+    background-color: grey;
+    height:500px;
+    overflow-x:hidden; 
+    overflow-y: scroll; 
+    padding-left:10px;
+}
+
 .remove_streamer_button{
     width: 10px;
     height: 10px;
     float:right;
     padding: 2px 0px 0px 0px; 
 }
-.streamer_list_name{
+
+.streamer_list_name {
     display:inline-block;
 }
+
 .streamer_list_views{
     display:inline-block;
     float:left;
 }
 
 .streamer_list {
-  /* border: 2px dashed blue; */
-  color: 262626;
+  float: left;
   margin: 10px 10px 0 0;
   padding: 5px;
   min-width:224px;
-  min-height:1000px;
+  min-height:430px;
+  border-style: solid;
 }
 
 .list {
@@ -47,14 +58,7 @@ body {
 
 /***  Extra ***/
 
-body {
-	font-family: Verdana, 'Trebuchet ms', Tahoma;
-}
 
-.container {
-	width: 600px;
-	margin: auto;
-}
 
 h2 {
 	text-align: center;
