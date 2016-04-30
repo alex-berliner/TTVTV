@@ -17,6 +17,7 @@ function init(){
  * other areas of the application.
  */
 function handle_comm_message(request, sender, sendResponse){
+    console.log("sasdfasd")
 	var stream_heartbeat_req_msg = "stream_heartbeat_req_msg";
 	var print_to_bg_msg = "print_to_bg_msg";
     var change_url_req_msg = "change_url_req_msg";
@@ -157,6 +158,12 @@ function check_valid_streams(request, sender, sendResponse){
     Promise.all(promise_array).then(function(result){
         sendResponse(actual_streamers_array);
     },function(){});
+}
+
+function dagbag(){
+    chrome.runtime.sendMessage({
+        "message" : "stream_went_offline"
+    });
 }
 
 /** 

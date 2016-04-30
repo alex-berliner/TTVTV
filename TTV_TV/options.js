@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', init);
  */
 function init_angular() {
 	var twitchSwitchApp = angular.module('ttvTvApp', ['ui.sortable']);
-
 	twitchSwitchApp.controller('streamerListController', function ($scope) {
 		ang_history_scope = $scope;
         $scope.active_streamers = [];
@@ -39,17 +38,20 @@ function init_angular() {
             save_streamer_prefs();
         }
         
-        var add_streamer_textbox = $("#add_streamer_textbox");
+        var add_streamer_textbox = document.getElementById("add_streamer_textbox");
 		$scope.add_streamer_single = function (name, visited_count) {
             if(!streamer_exists($scope.active_streamers, name) &&
                !streamer_exists($scope.inactive_streamers, name))
             {
+                var name_regex = new RegExp("^[a-zA-Z0-9_]{4,25}$");
+                if(!name.match(name_regex))
+                    return;
                 $scope.inactive_streamers.push({
                     "name" : name,
                     "visited_count" : visited_count
                 });
                 save_streamer_prefs();
-                $("#add_streamer_textbox").value="";
+                add_streamer_textbox.value = "";
             }
 		}
 

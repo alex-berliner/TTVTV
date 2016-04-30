@@ -3,9 +3,8 @@ body {
 }
 
 .streamer_dragger {
-    float: left;
     background-color: grey;
-    height:500px;
+    height:400px;
     overflow-x:hidden; 
     overflow-y: scroll; 
     padding-left:10px;
@@ -32,7 +31,7 @@ body {
   margin: 10px 10px 0 0;
   padding: 5px;
   min-width:224px;
-  min-height:430px;
+  min-height:330px;
   border-style: solid;
 }
 
@@ -58,11 +57,10 @@ body {
 
 /***  Extra ***/
 
-
-
 h2 {
 	text-align: center;
 }
+
 
 .floatleft {
   float: left;

@@ -4,6 +4,8 @@
   <link rel="stylesheet" href="libs/sortable-test.css" />
   <title>TTV TV Options</title>
 </head>
+<body>
+<div style="min-width: 570px; margin: 0 auto;">
 <div ng-app="ttvTvApp" ng-controller="streamerListController">
     <div id="status"></div>
     <button 
@@ -11,34 +13,33 @@
         ng-click="get_history_permission()" 
     >Generate History</button>
     <p>
-    <input id="add_streamer_textbox" ng-model="streamer_name" placeholder="Enter a streamer..."/>
+    <input   id="add_streamer_textbox" ng-model="streamer_name" placeholder="Enter a streamer..."/>
     <button 
         id="add_streamer_button"
         ng-click="add_streamer_single(streamer_name.toLowerCase(), 0);" 
     >Add</button>
     <p>
     <div id="gen-history-warning"></div>
-    <div>
-        <div class="streamer_dragger">
-            <h2><b>Unused Streamers</b></h2>
+    <div class="floatleft" style="display: inline-block;">
+        <div class="streamer_dragger floatleft">
+            <h2><b>Unused Channels</b></h2>
             <ul ui-sortable="sortableOptions" ng-model="inactive_streamers" class="streamer_list floatleft">
               <div ng-repeat="streamer in inactive_streamers track by $index" class="item">
-                <div class="streamer_list_views">{{streamer.visited_count}}</div>
+                <!-- <div class="streamer_list_views">{{streamer.visited_count}}</div> -->
                 <div class="streamer_list_name">{{streamer.name}}</div>
                 <input 
                     type="image"
                     ng-click="remove_streamer(streamer.name)" 
                     class="remove_streamer_button"
-                    src="libs/images/remove_streamer_icon.png" 
+                    src="libs/images/remove_streamer_icon.png" />
               </div>
             </ul>
         </div>
-        <div style="float: left; width:10px;"></div>
-        <div class="streamer_dragger">
-            <h2><b>Used Streamers</b></h2>
+        <div class="streamer_dragger floatleft">
+            <h2><b>Used Channels</b></h2>
             <ul ui-sortable="sortableOptions" ng-model="active_streamers" class="streamer_list floatleft">
               <div ng-repeat="streamer in active_streamers track by $index" class="item">
-                <div class="streamer_list_views">{{streamer.visited_count}}</div>
+                <!-- <div class="streamer_list_views">{{streamer.visited_count}}</div> -->
                 <div class="streamer_list_name">{{streamer.name}}</div>
                 <input 
                     type="image"
@@ -48,6 +49,8 @@
             </div>
         </div>
     </div>
+    <div class="clear"></div>
+    </body>
 </div>
     <script src="libs/jquery-2.2.1.min.js"></script>
     <script src="libs/jquery-ui.min.js"></script>

@@ -1,16 +1,15 @@
 TODO:
-    streamer text sanitization
-        function that performs lowercase and clears input field, returns "" if bad string to check against. don't clear input field if ""
+    switching streams popup
     Make enter streamer text box use enter key
+    Make 440x280 tile of "switching streams" popup
     red X on purple hurts eyeballs
-    force streamer draggers to be snapped together
-    fix up css
+    add twitch url blacklist
+    =========release 1=================
     export preferences
     add options lock
     add "switching stream in x seconds" indicator
     add recommended and games field for streams
     make stream logos appear next to streamer name
-    add twitch url blacklist
     multiselect
     
     
