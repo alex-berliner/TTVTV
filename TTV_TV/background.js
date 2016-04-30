@@ -24,6 +24,7 @@ function handle_comm_message(request, sender, sendResponse){
     var get_valid_streamers_msg = "get_valid_streamers_msg";
     var save_streamer_prefs_msg = "save_streamer_prefs_msg";
     var load_streamer_prefs_msg = "load_streamer_prefs_msg";
+    var get_online_streams_msg = "get_online_streams_msg";
     if (request.message === stream_heartbeat_req_msg) {
         // console.log("background.js: Received message from content.js!")
         // console.log("Sending heartbeat response for tab " + sender.url)
@@ -50,6 +51,9 @@ function handle_comm_message(request, sender, sendResponse){
     else if(request.message === load_streamer_prefs_msg){
         load_streamer_prefs(sendResponse);
     } 
+    else if(request.message === get_online_streams_msg){
+        get_online_streams(request, sender, sendResponse);
+    }
     return true;
     
 }
@@ -90,7 +94,7 @@ function load_streamer_prefs(sendResponse) {
  */
 function change_url_req(request, sender, sendResponse){
 	load_streamer_prefs(function (pref_obj) {
-        check_online_streams(pref_obj,function(fav_streams){
+        rank_online_streams(pref_obj,function(fav_streams){
             if(fav_streams.length == 0){
                 console.log("Can't switch, no stream preferences found!");
                 return;
@@ -106,11 +110,24 @@ function change_url_req(request, sender, sendResponse){
     
 }
 
+function get_online_streams(request, sender, sendResponse){
+	load_streamer_prefs(function (pref_obj) {
+        rank_online_streams(pref_obj,function(fav_streams){
+            if(fav_streams.length == 0){
+                console.log("Can't switch, no stream preferences found!");
+                return;
+            }
+            sendResponse(fav_streams);
+        });
+	});
+    
+}
+
 /**
  * Determines the most highly recommended streams
  * based on a generic streamer array.
  */
-function check_online_streams(pref_obj,sendResponse){
+function rank_online_streams(pref_obj,sendResponse){
     potential_streamers_array = pref_obj.active_streamers;
     //add all promises to array
     var recommended_streamers_array = [];

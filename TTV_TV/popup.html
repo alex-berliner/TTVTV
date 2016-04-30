@@ -1,4 +1,4 @@
-<div id="ttvtv-popup" style="
+<div ng-app="ttvtv_switch_popup" ng-controller="popup_controller" id="ttvtv-popup" style="
     z-index: 9999;
     position: absolute; 
     border: 2px solid #6441A5;
@@ -10,10 +10,10 @@
     width: 350px;
     height: 80px; 
     transition: opacity 500ms;
-    visibility: visible;
-    opacity: 1;
+    visibility: hidden;
+    opacity: 0;
 ">
-    <div style="
+    <div id="ttvtv-switch-countdown" style="
         position: absolute;
         font-size:large;
         left: 322px;
@@ -21,8 +21,9 @@
         font-weight: bold;
     ">5</div>
     <div style="font-size:large">Switching to</div>
-    <div style="font-size:x-large">Streaaaaaaaaaaaaaaaaaamer</div>
-    <button class="ttvtv_cancel_redir" style="
+    <div id="ttvtv-streamer-name" style="font-size:x-large"></div>
+    <button id="ttvtv-cancel-redir"
+        style="
         position: absolute;
         left: 270px;
         top: 55px;
