@@ -17,7 +17,7 @@ function stream_hb_check(){
     var stream_url = document.location.href;
     stream_url_split = stream_url.split(".tv/");
     if($("#player").length > 0){
-        console.log("ping")
+        // console.log("ping")
         var streamer_username = stream_url_split[1];
         var page_data_init_obj = $($(".player")[0]).attr("data-initializing")
         var twitch_data_initializing = 
