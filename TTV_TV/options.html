@@ -16,7 +16,7 @@
     <input   id="add_streamer_textbox" ng-model="streamer_name" placeholder="Enter a streamer..."/>
     <button 
         id="add_streamer_button"
-        ng-click="add_streamer_single(streamer_name.toLowerCase(), 0);" 
+        ng-click="add_streamer_single(streamer_name.toLowerCase(), 0);save_streamer_prefs();" 
     >Add</button>
     <p>
     <div id="gen-history-warning"></div>

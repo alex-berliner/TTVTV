@@ -143,8 +143,9 @@ function check_valid_streams(request, sender, sendResponse){
     var potential_streamers_array = request.potential_streamers;
     //add all promises to array
     var actual_streamers_array = [];
-    var promise_array = [];
-    for(let i = 0; i < potential_streamers_array.length; i++){
+    var promise_array = [];    
+    for(let i = 0; i < potential_streamers_array.length; i++) {
+        
         var url_beg = "https://api.twitch.tv/kraken/channels/" +
             potential_streamers_array[i].name;
         var streamer_promise = $http(url_beg)

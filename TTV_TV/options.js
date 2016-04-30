@@ -1,5 +1,6 @@
 ////////global variables//////////
 
+var streamer_name_blacklist = [];
 var twitchSwitchApp;
 var ang_history_scope;
 
@@ -14,20 +15,33 @@ document.addEventListener('DOMContentLoaded', init);
  * Initializes all angular controls for the web page
  */
 function init_angular() {
+    $.get(chrome.extension.getURL('static/name_blacklist.txt'), function(data) {
+        streamer_name_blacklist = data.split("\n");
+        for(var i = 0; i < streamer_name_blacklist.length; i++){
+            streamer_name_blacklist[i] = streamer_name_blacklist[i].trim();
+        }
+    });
+    
+    
 	var twitchSwitchApp = angular.module('ttvTvApp', ['ui.sortable']);
 	twitchSwitchApp.controller('streamerListController', function ($scope) {
 		ang_history_scope = $scope;
         $scope.active_streamers = [];
         $scope.inactive_streamers = [];
         
-        $scope.prune_dupes = function(){
-            
+        $scope.cleanup = function(){
+            for(var i = 0; i < streamer_name_blacklist.length; i++){
+                var temp_name = streamer_name_blacklist[i];
+                $scope.remove_streamer(temp_name)
+            }
+            $scope.save_streamer_prefs();
         }
         
         //probably missing stuff
         $scope.remove_streamer = function(name){
             function rm_helper(arr,name){
-                for(var i = 0; i < arr.length; i++){
+                var i = arr.length;
+                while(i--){
                     if(arr[i].name == name){
                         arr.splice(i,1);
                     }
@@ -35,11 +49,18 @@ function init_angular() {
             }
             rm_helper($scope.inactive_streamers, name);
             rm_helper($scope.active_streamers, name);
-            save_streamer_prefs();
         }
+        
+        $scope.save_streamer_prefs = save_streamer_prefs;
         
         var add_streamer_textbox = document.getElementById("add_streamer_textbox");
 		$scope.add_streamer_single = function (name, visited_count) {
+            //make sure entered stream name isn't a blacklisted word
+            for(var i = 0; i < streamer_name_blacklist.length; i++){
+                if(streamer_name_blacklist[i] == name)
+                    return;
+            }
+            //make sure entered stream name is a valid twitch name
             if(!streamer_exists($scope.active_streamers, name) &&
                !streamer_exists($scope.inactive_streamers, name))
             {
@@ -50,7 +71,6 @@ function init_angular() {
                     "name" : name,
                     "visited_count" : visited_count
                 });
-                save_streamer_prefs();
                 add_streamer_textbox.value = "";
             }
 		}
@@ -72,7 +92,7 @@ function init_angular() {
 		$scope.sortableOptions = {
             connectWith: ".streamer_list",
 			stop : function (e, ui) {
-				save_streamer_prefs();
+				$scope.save_streamer_prefs();
 			}
             // ,
 			// activate : function () {
@@ -210,8 +230,11 @@ function get_valid_streams(potential_streamer_arr) {
 		"potential_streamers" : potential_streamer_arr
 	}, function (streamers) {
 		sort_streamer_array(streamers)
+        
+        //this is the last bit of code called when generate stream is pressed
 		ang_history_scope.set_inactive_arr(streamers);
 		ang_history_scope.set_active_arr([]);
+        ang_history_scope.cleanup()
 		save_streamer_prefs();
 	});
 }
