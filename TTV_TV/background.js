@@ -113,10 +113,6 @@ function change_url_req(request, sender, sendResponse){
 function get_online_streams(request, sender, sendResponse){
 	load_streamer_prefs(function (pref_obj) {
         rank_online_streams(pref_obj,function(fav_streams){
-            if(fav_streams.length == 0){
-                console.log("Can't switch, no stream preferences found!");
-                return;
-            }
             sendResponse(fav_streams);
         });
 	});

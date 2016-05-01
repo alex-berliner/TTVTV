@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', function(){
         $(data).prependTo($("#main_col")[0]);
         $("#ttvtv-cancel-redir").click(function(){
             close_popup();
+            redirect_canceled = true;
         });
     });
-    
     redirect_active = false;
     redirect_canceled = false;
+    redirect_count = 5;
 });
 /**
  * Launches a stream heartbeat check request to background
@@ -35,34 +36,19 @@ function stream_hb_check(){
             page_stream_online_obj != undefined &&
             page_stream_online_obj == "false"
         if (!twitch_data_initializing && !twitch_stream_online){
-            if(!redirect_canceled && !redirect_active){
-                console.log("Ssdsd")
+            if(!redirect_active && !redirect_canceled){
                 redirect_active = true;
-                show_popup();
+                start_redirect();
             }
         }
     }
 }
 
-function show_popup(){
-    console.log("show_popup")
-    chrome.runtime.sendMessage({
-        "message" : "get_online_streams_msg"
-    },function(streamer_array){
-        console.log(streamer_array)
-        if(streamer_array.length > 0){
-            var popup = $("#ttvtv-popup");
-            $(popup).css("visibility","visible");
-            $(popup).css("opacity","1")
-            $("#ttvtv-streamer-name").text(streamer_array[0].name)
-            start_redirect();
-        } else {
-            redirect_canceled = false;
-        }
-    });
-}
-
-function update_popup(){
+function show_popup(streamer){    
+    var popup = $("#ttvtv-popup");
+    $(popup).css("visibility","visible");
+    $(popup).css("opacity","1");
+    $("#ttvtv-streamer-name").text(streamer);
     var popup_timer = $("#ttvtv-switch-countdown");
     popup_timer.text(redirect_count);
 }
@@ -71,25 +57,32 @@ function close_popup(){
     var popup = $("#ttvtv-popup");
     $(popup).css("visibility","hidden");
     $(popup).css("opacity","0");
-    redirect_canceled = true;
 }
 
 function start_redirect(){
-    update_popup();
-    console.log("ping");
-    if(redirect_count == 0 && redirect_active && !redirect_canceled){
-        console.log("swtich")
-        chrome.runtime.sendMessage({
-            "message" : "change_url_req_msg"
-        });
-        redirect_active = false;
-        redirect_canceled = false;
-    } else if(redirect_count > 0){
-        redirect_count--;
-        setTimeout(function(){
-            start_redirect();
-        }, 1000);
-    }
+    chrome.runtime.sendMessage({
+        "message" : "get_online_streams_msg"
+    }, function(streamer_array) {
+        if(streamer_array.length > 0 && !redirect_canceled) {
+            show_popup(streamer_array[0].name);
+            if(redirect_count == 0 && redirect_active) {
+            chrome.runtime.sendMessage({
+                "message" : "change_url_req_msg"
+            });
+            } else if(redirect_count > 0){
+                redirect_count--;
+                setTimeout(function(){
+                    start_redirect();
+                }, 1000);
+            }
+        } else {
+            // go back to checking if no streams in array
+            console.log("streamer_array is 0")
+            redirect_active = false;
+            redirect_count = 5;
+            close_popup();
+        }
+    });
 }
 
 /**
