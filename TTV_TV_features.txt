@@ -1,7 +1,6 @@
 TODO:
     Make 440x280 tile of "switching streams" popup
     red X on purple hurts eyeballs
-    add new streamers to inactive when navigated to
     =========release 1=================
     export preferences
     add options lock

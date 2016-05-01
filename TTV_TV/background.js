@@ -101,6 +101,15 @@ function change_url_req(request, sender, sendResponse){
             }
             var switch_url =
                 "https://www.twitch.tv/" + fav_streams[0].name;
+            console.log(request.current);
+            if(request.current.trim() == fav_streams[0].name.trim()){
+                if(fav_streams.length>1){switch_url = switch_url =
+                    "https://www.twitch.tv/" + fav_streams[1].name;
+                } else {
+                    return;
+                }
+            }
+            
             console.log("switching to " + switch_url);
             change_tab_url(sender.tab.id, 
                 switch_url

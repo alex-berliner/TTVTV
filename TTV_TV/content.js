@@ -65,11 +65,31 @@ function start_redirect(){
         "message" : "get_online_streams_msg"
     }, function(streamer_array) {
         if(streamer_array.length > 0 && !redirect_canceled) {
-            show_popup(streamer_array[0].name);
+            
+            var stream_url = document.location.href;
+            var stream_url_split = stream_url.split(".tv/");
+            var streamer_username = stream_url_split[1].split("/")[0];
+            var show_name = streamer_array[0].name;
+            if(streamer_username.trim() == show_name.trim()){
+                if(streamer_array.length > 1){
+                    show_name = streamer_array[1].name;
+                    bglog("using 2");
+                } else {
+                    redirect_active = false;
+                    redirect_count = 5;
+                    close_popup();
+                    return;
+                }
+            }
+            show_popup(show_name); 
             if(redirect_count == 0 && redirect_active) {
-            chrome.runtime.sendMessage({
-                "message" : "change_url_req_msg"
-            });
+                var stream_url = document.location.href;
+                var stream_url_split = stream_url.split(".tv/");
+                var streamer_username = stream_url_split[1].split("/")[0];
+                chrome.runtime.sendMessage({
+                    "message" : "change_url_req_msg",
+                    "current" : streamer_username
+                });
             } else if(redirect_count > 0){
                 redirect_count--;
                 setTimeout(function(){

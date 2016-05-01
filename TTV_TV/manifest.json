@@ -1,7 +1,7 @@
 {
    "manifest_version":2,
    "name":"TTV TV",
-   "description":"Intelligently opens a new Twitch.tv stream when a user's currently watched one closes.",
+   "description":"Opens a new Twitch.tv stream when a user's currently watched one closes.",
    "version":"1",
    "browser_action":{
       "default_icon":"libs/images/icon128.png"
