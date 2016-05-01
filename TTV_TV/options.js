@@ -57,13 +57,13 @@ function init_angular() {
         }
         
         $scope.check_show_gen = function(){
-            if(($scope.active_streamers.length + $scope.inactive_streamers.length) > 0){
-                $("#gen-history").css("display", "none");
-                console.log("hide");
-            } else {
-                $("#gen-history").css("display", "block");
-                console.log("show");
-            }
+            // if(($scope.active_streamers.length + $scope.inactive_streamers.length) > 0){
+                // $("#gen-history").css("display", "none");
+                // console.log("hide");
+            // } else {
+                // $("#gen-history").css("display", "block");
+                // console.log("show");
+            // }
         }
         
         $scope.save_streamer_prefs = save_streamer_prefs;
@@ -208,17 +208,27 @@ function sort_streamer_array(streamer_array) {
  * of potential usernames
  */
 function get_valid_streams(potential_streamer_arr) {
-	bglog("get_valid_streams(");
-	bglog(potential_streamer_arr);
+	// bglog("get_valid_streams(");
+	// bglog(potential_streamer_arr);
 	chrome.runtime.sendMessage({
 		"message" : "get_valid_streamers_msg",
 		"potential_streamers" : potential_streamer_arr
 	}, function (streamers) {
 		sort_streamer_array(streamers)
-        
         //this is the last bit of code called when generate stream is pressed
-		ang_history_scope.set_inactive_arr(streamers);
-		ang_history_scope.set_active_arr([]);
+        var all_streamers = ang_history_scope.inactive_streamers.concat(ang_history_scope.active_streamers)
+        name_hm = {}
+        for(var i = 0; i < all_streamers.length; i++){
+            name_hm[streamers[i].name] = 1;
+        }
+        for(var i = 0; i < streamers.length; i++){
+            if(name_hm[streamers[i].name] != 1){
+                ang_history_scope.add_streamer_single(streamers[i].name, streamers[i].visited_count);
+            }
+        }
+        
+		// ang_history_scope.set_inactive_arr(streamers);
+		// ang_history_scope.set_active_arr([]);
         ang_history_scope.cleanup()
 		save_streamer_prefs();
 	});
