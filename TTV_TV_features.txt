@@ -1,10 +1,10 @@
 TODO:
-    switching streams popup
-    Make enter streamer text box use enter key
     Make 440x280 tile of "switching streams" popup
     red X on purple hurts eyeballs
-    generate visible if stream lists have contents
+    Make enter streamer text box use enter key
+    generate visible button if stream lists have contents
     add new streamers to inactive when navigated to
+    bug: not saving when delete is pressed
     =========release 1=================
     export preferences
     add options lock

@@ -7,19 +7,10 @@
 <body>
 <div style="min-width: 570px; margin: 0 auto;">
 <div ng-app="ttvTvApp" ng-controller="streamerListController">
-    <div id="status"></div>
-    <button 
-        id="gen-history"
-        ng-click="get_history_permission()" 
-    >Generate History</button>
+    <form id="add_streamer_textbox" ng-model="streamer_name" >
+        <input type="text" id="add_streamer_field" placeholder="Enter a streamer..."/>
+    </form>
     <p>
-    <input   id="add_streamer_textbox" ng-model="streamer_name" placeholder="Enter a streamer..."/>
-    <button 
-        id="add_streamer_button"
-        ng-click="add_streamer_single(streamer_name.toLowerCase(), 0);save_streamer_prefs();" 
-    >Add</button>
-    <p>
-    <div id="gen-history-warning"></div>
     <div class="floatleft" style="display: inline-block;">
         <div class="streamer_dragger floatleft">
             <h2><b>Unused Channels</b></h2>
@@ -29,7 +20,7 @@
                 <div class="streamer_list_name">{{streamer.name}}</div>
                 <input 
                     type="image"
-                    ng-click="remove_streamer(streamer.name)" 
+                    ng-click="remove_streamer_and_save(streamer.name)" 
                     class="remove_streamer_button"
                     src="libs/images/remove_streamer_icon.png" />
               </div>
@@ -43,13 +34,21 @@
                 <div class="streamer_list_name">{{streamer.name}}</div>
                 <input 
                     type="image"
-                    ng-click="remove_streamer(streamer.name)" 
+                    ng-click="remove_streamer_and_save(streamer.name)" 
                     class="remove_streamer_button"
                     src="libs/images/remove_streamer_icon.png" />
             </div>
         </div>
     </div>
     <div class="clear"></div>
+    <p>
+    <button 
+        style="display:none"
+        id="gen-history"
+        ng-click="get_history_permission()" 
+    >Generate History</button>
+    <p>
+    <div id="gen-history-warning"></div>
     </body>
 </div>
     <script src="libs/jquery-2.2.1.min.js"></script>

@@ -37,7 +37,11 @@ function init_angular() {
             $scope.save_streamer_prefs();
         }
         
-        //probably missing stuff
+        $scope.remove_streamer_and_save = function(name){
+            $scope.remove_streamer(name);
+            $scope.save_streamer_prefs();
+        }
+        
         $scope.remove_streamer = function(name){
             function rm_helper(arr,name){
                 var i = arr.length;
@@ -49,11 +53,22 @@ function init_angular() {
             }
             rm_helper($scope.inactive_streamers, name);
             rm_helper($scope.active_streamers, name);
+            $scope.check_show_gen();
+        }
+        
+        $scope.check_show_gen = function(){
+            if(($scope.active_streamers.length + $scope.inactive_streamers.length) > 0){
+                $("#gen-history").css("display", "none");
+                console.log("hide");
+            } else {
+                $("#gen-history").css("display", "block");
+                console.log("show");
+            }
         }
         
         $scope.save_streamer_prefs = save_streamer_prefs;
         
-        var add_streamer_textbox = document.getElementById("add_streamer_textbox");
+        var add_streamer_field = document.getElementById("add_streamer_field");
 		$scope.add_streamer_single = function (name, visited_count) {
             //make sure entered stream name isn't a blacklisted word
             for(var i = 0; i < streamer_name_blacklist.length; i++){
@@ -71,7 +86,7 @@ function init_angular() {
                     "name" : name,
                     "visited_count" : visited_count
                 });
-                add_streamer_textbox.value = "";
+                add_streamer_field.value = "";
             }
 		}
 
@@ -94,43 +109,6 @@ function init_angular() {
 			stop : function (e, ui) {
 				$scope.save_streamer_prefs();
 			}
-            // ,
-			// activate : function () {
-				// console.log("activate");
-			// },
-			// beforeStop : function () {
-				// console.log("beforeStop");
-			// },
-			// change : function () {
-				// console.log("change");
-			// },
-			// create : function () {
-				// console.log("create");
-			// },
-			// deactivate : function () {
-				// console.log("deactivate");
-			// },
-			// out : function () {
-				// console.log("out");
-			// },
-			// over : function () {
-				// console.log("over");
-			// },
-			// receive : function () {
-				// console.log("receive");
-			// },
-			// remove : function () {
-				// console.log("remove");
-			// },
-			// sort : function () {
-				// console.log("sort");
-			// },
-			// start : function () {
-				// console.log("start");
-			// },
-			// update : function (e, ui) {
-				// console.log("update");
-			// }
 		};
         function streamer_exists(arr, name){
             for(var i = 0; i < arr.length; i++){
@@ -145,6 +123,13 @@ function init_angular() {
  * Called on program start
  */
 function init() {
+    document.getElementById("add_streamer_textbox").addEventListener("submit", function() {
+            var streamer_name = $("#add_streamer_field").val().toLowerCase();
+            console.log(streamer_name);
+            ang_history_scope.add_streamer_single(streamer_name, 0);
+            save_streamer_prefs();
+        });
+
 	bglog("init()");
 	load_streamer_prefs();
 }
@@ -244,9 +229,9 @@ function get_valid_streams(potential_streamer_arr) {
  * background for saving
  */
 function save_streamer_prefs(callback=function(){}) {
-    console.log("Saving streamers");
-    console.log(ang_history_scope.active_streamers);
-    bglog("Saving streamers")
+    // console.log("Saving streamers");
+    // console.log(ang_history_scope.active_streamers);
+    // bglog("Saving streamers")
 	chrome.runtime.sendMessage({
 		"message" : "save_streamer_prefs_msg",
 		"inactive_streamers" : ang_history_scope.inactive_streamers,
@@ -255,6 +240,7 @@ function save_streamer_prefs(callback=function(){}) {
 		bglog("You so save!");
         ang_history_scope.$apply();
         callback();
+        ang_history_scope.check_show_gen();
 	});
 }
 
@@ -272,6 +258,7 @@ function load_streamer_prefs() {
 		ang_history_scope.set_inactive_arr(pref_obj.inactive_streamers);
 		ang_history_scope.set_active_arr(pref_obj.active_streamers);
 		ang_history_scope.$apply();
+        ang_history_scope.check_show_gen();
 	});
 }
 

@@ -26,7 +26,7 @@ function stream_hb_check(){
     if($("#player").length > 0){
         // console.log("ping")
         var streamer_username = stream_url_split[1];
-        var page_data_init_obj = $($(".player")[0]).attr("data-initializing")
+        var page_data_init_obj = $($(".player")[0]).attr("data-initializing");
         var twitch_data_initializing = 
             page_data_init_obj == undefined || page_data_init_obj == "true"
         
