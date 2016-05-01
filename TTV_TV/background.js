@@ -8,7 +8,7 @@ function init(){
     init_db();
     //open settings page in new tab on browser button click
     chrome.browserAction.onClicked.addListener(function(tab) {
-        chrome.tabs.create({"url": "chrome-extension://lfpiejkfapjmehcfafmijmijnilkggam/options.html"});
+        chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
     });
 }
 
@@ -172,12 +172,6 @@ function check_valid_streams(request, sender, sendResponse){
     Promise.all(promise_array).then(function(result){
         sendResponse(actual_streamers_array);
     },function(){});
-}
-
-function dagbag(){
-    chrome.runtime.sendMessage({
-        "message" : "stream_went_offline"
-    });
 }
 
 /** 

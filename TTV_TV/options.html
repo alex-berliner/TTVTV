@@ -8,9 +8,14 @@
 <div style="min-width: 570px; margin: 0 auto;">
 <div ng-app="ttvTvApp" ng-controller="streamerListController">
     <form id="add_streamer_textbox" ng-model="streamer_name" >
-        <input type="text" id="add_streamer_field" placeholder="Enter a streamer..."/>
+        <input style="float: left;" type="text" id="add_streamer_field" placeholder="Enter a streamer..."/>
+        <button 
+        
+        style="display:none; float: right;"
+        id="gen-history"
+        ng-click="get_history_permission()" 
+    >Generate History</button>
     </form>
-    <p>
     <div class="floatleft" style="display: inline-block;">
         <div class="streamer_dragger floatleft">
             <h2><b>Unused Channels</b></h2>
@@ -41,13 +46,6 @@
         </div>
     </div>
     <div class="clear"></div>
-    <p>
-    <button 
-        style="display:none"
-        id="gen-history"
-        ng-click="get_history_permission()" 
-    >Generate History</button>
-    <p>
     <div id="gen-history-warning"></div>
     </body>
 </div>

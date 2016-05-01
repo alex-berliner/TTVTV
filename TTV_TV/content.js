@@ -23,10 +23,11 @@ document.addEventListener('DOMContentLoaded', function(){
  */
 function stream_hb_check(){
     var stream_url = document.location.href;
-    stream_url_split = stream_url.split(".tv/");
+    var stream_url_split = stream_url.split(".tv/");
     if($("#player").length > 0){
         // console.log("ping")
-        var streamer_username = stream_url_split[1];
+        var streamer_username = stream_url_split[1].split("/")[0];
+        // console.log(streamer_username);
         var page_data_init_obj = $($(".player")[0]).attr("data-initializing");
         var twitch_data_initializing = 
             page_data_init_obj == undefined || page_data_init_obj == "true"
