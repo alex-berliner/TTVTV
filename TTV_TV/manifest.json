@@ -40,7 +40,6 @@
    ],
    "background":{
       "scripts":[
-        "db.js",
         "background.js"
       ]
    }

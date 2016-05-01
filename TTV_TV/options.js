@@ -125,7 +125,7 @@ function init_angular() {
 function init() {
     document.getElementById("add_streamer_textbox").addEventListener("submit", function() {
             var streamer_name = $("#add_streamer_field").val().toLowerCase();
-            console.log(streamer_name);
+            // console.log(streamer_name);
             ang_history_scope.add_streamer_single(streamer_name, 0);
             save_streamer_prefs();
         });
@@ -214,16 +214,25 @@ function get_valid_streams(potential_streamer_arr) {
 		"message" : "get_valid_streamers_msg",
 		"potential_streamers" : potential_streamer_arr
 	}, function (streamers) {
+        // console.log(streamers)
 		sort_streamer_array(streamers)
         //this is the last bit of code called when generate stream is pressed
         var all_streamers = ang_history_scope.inactive_streamers.concat(ang_history_scope.active_streamers)
         name_hm = {}
+        // console.log("all_streamers")
+        // console.log(all_streamers)
         for(var i = 0; i < all_streamers.length; i++){
-            name_hm[streamers[i].name] = 1;
+            name_hm[all_streamers[i].name] = 1;
+            // console.log("ignoring: " + streamers[i].name);
+            // console.log(name_hm[streamers[i].name]);
+            
         }
+        // console.log(name_hm);
         for(var i = 0; i < streamers.length; i++){
             if(name_hm[streamers[i].name] != 1){
                 ang_history_scope.add_streamer_single(streamers[i].name, streamers[i].visited_count);
+            } else {
+                // console.log("ignoring " + streamers[i].name)
             }
         }
         
@@ -264,7 +273,7 @@ function load_streamer_prefs() {
 		"message" : "load_streamer_prefs_msg"
 	}, function (pref_obj) {
 		// streamer_array = pref_obj.streamer_array;
-        console.log(pref_obj);
+        // console.log(pref_obj);
 		ang_history_scope.set_inactive_arr(pref_obj.inactive_streamers);
 		ang_history_scope.set_active_arr(pref_obj.active_streamers);
 		ang_history_scope.$apply();

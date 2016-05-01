@@ -73,7 +73,7 @@ function start_redirect(){
             if(streamer_username.trim() == show_name.trim()){
                 if(streamer_array.length > 1){
                     show_name = streamer_array[1].name;
-                    bglog("using 2");
+                    // bglog("using 2");
                 } else {
                     redirect_active = false;
                     redirect_count = 5;
@@ -98,7 +98,7 @@ function start_redirect(){
             }
         } else {
             // go back to checking if no streams in array
-            console.log("streamer_array is 0")
+            // console.log("streamer_array is 0")
             redirect_active = false;
             redirect_count = 5;
             close_popup();
@@ -110,7 +110,7 @@ function start_redirect(){
  * log to background instead of content script
  */
 function bglog(str){
-    console.log(str);
+    // console.log(str);
     chrome.runtime.sendMessage({
         "message" : "print_to_bg_msg", 
         "printconts" : str

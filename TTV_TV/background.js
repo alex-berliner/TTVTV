@@ -17,7 +17,7 @@ function init(){
  * other areas of the application.
  */
 function handle_comm_message(request, sender, sendResponse){
-    console.log("sasdfasd")
+    // console.log("sasdfasd")
 	var stream_heartbeat_req_msg = "stream_heartbeat_req_msg";
 	var print_to_bg_msg = "print_to_bg_msg";
     var change_url_req_msg = "change_url_req_msg";
@@ -37,9 +37,9 @@ function handle_comm_message(request, sender, sendResponse){
     }
     else if(request.message === print_to_bg_msg){
         if(sender.tab == undefined){
-            console.log("Options menu: "+ request.printconts)
+            // console.log("Options menu: "+ request.printconts)
         } else {
-            console.log(sender.tab.id + ": " + request.printconts);
+            // console.log(sender.tab.id + ": " + request.printconts);
         }
     }
     else if(request.message === get_valid_streamers_msg){
@@ -65,7 +65,7 @@ function handle_comm_message(request, sender, sendResponse){
 function save_streamer_prefs(request, sender, sendResponse) {
     var active_streamers = request.active_streamers
     var inactive_streamers = request.inactive_streamers
-    console.log(inactive_streamers);
+    // console.log(inactive_streamers);
 	chrome.storage.sync.set({
 		"inactive_streamers" : inactive_streamers,
         "active_streamers"   : active_streamers
@@ -96,12 +96,12 @@ function change_url_req(request, sender, sendResponse){
 	load_streamer_prefs(function (pref_obj) {
         rank_online_streams(pref_obj,function(fav_streams){
             if(fav_streams.length == 0){
-                console.log("Can't switch, no stream preferences found!");
+                // console.log("Can't switch, no stream preferences found!");
                 return;
             }
             var switch_url =
                 "https://www.twitch.tv/" + fav_streams[0].name;
-            console.log(request.current);
+            // console.log(request.current);
             if(request.current.trim() == fav_streams[0].name.trim()){
                 if(fav_streams.length>1){switch_url = switch_url =
                     "https://www.twitch.tv/" + fav_streams[1].name;
@@ -110,7 +110,7 @@ function change_url_req(request, sender, sendResponse){
                 }
             }
             
-            console.log("switching to " + switch_url);
+            // console.log("switching to " + switch_url);
             change_tab_url(sender.tab.id, 
                 switch_url
             );
